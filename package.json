@@ -9,10 +9,12 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/db": "^0.18.3",
     "@astrojs/mdx": "^4.3.13",
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",
     "astro": "^5.16.12",
+    "better-sqlite3": "^12.6.2",
     "sharp": "^0.34.3"
   }
 }
