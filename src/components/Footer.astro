@@ -18,22 +18,41 @@ const today = new Date();
 </footer>
 <style>
 	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
+		padding: 3em 1em 6em 1em;
+		background: var(--bg-darker);
+		color: var(--text-secondary);
 		text-align: center;
+		border-top: 4px solid var(--balatro-red);
+		border-bottom: 2px solid var(--balatro-blue);
+		margin-top: 4em;
+		box-shadow: 
+			inset 0 4px 0 rgba(220, 38, 38, 0.3),
+			inset 0 -2px 0 rgba(37, 99, 235, 0.3);
 	}
+	
 	.social-links {
 		display: flex;
 		justify-content: center;
 		gap: 1em;
-		margin-top: 1em;
+		margin-top: 1.5em;
 	}
+	
 	.social-links a {
 		text-decoration: none;
-		color: rgb(var(--gray));
+		color: var(--balatro-blue);
+		transition: all 0.1s ease;
+		padding: 0.5em;
+		border-radius: 0;
+		border: 3px solid var(--balatro-blue);
+		box-shadow: 3px 3px 0px rgba(37, 99, 235, 0.4);
 	}
+	
 	.social-links a:hover {
-		color: rgb(var(--gray-dark));
+		color: var(--balatro-red-bright);
+		border-color: var(--balatro-red-bright);
+		box-shadow: 
+			4px 4px 0px rgba(220, 38, 38, 0.5),
+			0 0 10px rgba(220, 38, 38, 0.5);
+		transform: translate(-2px, -2px);
 	}
 </style>
