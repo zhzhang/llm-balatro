@@ -1,7 +1,5 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { db, gameRuns, turnHistory, screenshots, eq, desc } from 'astro:db';
 
@@ -371,7 +369,6 @@ const agents = [...new Set(runs.map(r => r.agent).filter(Boolean))].sort();
     </style>
   </head>
   <body>
-    <Header />
     <main class="container">
       <h1>Balatro Agent Gameplay</h1>
 
@@ -446,7 +443,6 @@ const agents = [...new Set(runs.map(r => r.agent).filter(Boolean))].sort();
         </div>
       </div>
     </main>
-    <Footer />
 
     <script define:vars={{ runs, turnsByRun, screenshotsByRun }}>
       const seedFilter = document.getElementById('seed-filter');
