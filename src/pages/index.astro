@@ -113,6 +113,11 @@ for (const run of runMetadata) {
 			padding: 2rem;
 			background-color: var(--bg-secondary);
 			border-radius: 8px;
+			width: calc(100vw - 4rem);
+			max-width: 1400px;
+			position: relative;
+			left: 50%;
+			transform: translateX(-50%);
 		}
 
 		.turn-history-section h2 {
@@ -288,6 +293,7 @@ for (const run of runMetadata) {
 
 			.turn-history-section {
 				padding: 1.5rem;
+				width: calc(100vw - 3rem);
 			}
 
 			.selector-controls {
@@ -357,7 +363,7 @@ for (const run of runMetadata) {
 					<table class="outcomes-table">
 						<thead>
 							<tr>
-								<th>Agent</th>
+								<th>Seed</th>
 								<th>22V4E3UE</th>
 								<th>2JW2IH4X</th>
 								<th>422J6NUH</th>
@@ -372,7 +378,7 @@ for (const run of runMetadata) {
 						</thead>
 						<tbody>
 							<tr>
-								<th>claude</th>
+								<th>claude-4.5-sonnet</th>
 								<td class="lost">Ante 6</td>
 								<td class="lost">Ante 6</td>
 								<td class="lost">Ante 5</td>
@@ -385,20 +391,7 @@ for (const run of runMetadata) {
 								<td class="lost">Ante 4</td>
 							</tr>
 							<tr>
-								<th>gemini</th>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="lost">Ante 4</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-							</tr>
-							<tr>
-								<th>openai</th>
+								<th>gpt-5.2</th>
 								<td class="lost">Ante 5</td>
 								<td class="lost">Ante 5</td>
 								<td class="lost">Ante 7</td>
@@ -410,12 +403,25 @@ for (const run of runMetadata) {
 								<td class="won">WON</td>
 								<td class="won">WON</td>
 							</tr>
+							<tr>
+								<th>gemini-3-flash</th>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="lost">Ante 4</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
 
 				<p>
-					I think you'll notice the surprise here immediately: gemini-3-nano trounces both claude-4.5-sonnet and gpt-5.2, and this is despite going up against bigger and more expensive models.
+					I think you'll notice the surprise here immediately: gemini-3-nano trounces both claude-4.5-sonnet and gpt-5.2, and despite going up against bigger, more expensive models.
 				</p>
 
 				<div class="turn-history-section">
@@ -428,7 +434,7 @@ for (const run of runMetadata) {
 							<select id="agent-select">
 								<option value="">-- Select Agent --</option>
 								{agents.map(agent => (
-									<option value={agent}>{agent}</option>
+									<option value={agent} selected={agent === 'gemini'}>{agent}</option>
 								))}
 							</select>
 						</div>
@@ -438,7 +444,7 @@ for (const run of runMetadata) {
 							<select id="seed-select">
 								<option value="">-- Select Seed --</option>
 								{seeds.map(seed => (
-									<option value={seed}>{seed}</option>
+									<option value={seed} selected={seed === '22V4E3UE'}>{seed}</option>
 								))}
 							</select>
 						</div>
@@ -651,6 +657,11 @@ for (const run of runMetadata) {
 						goToNextTurn();
 					}
 				});
+
+				// Auto-load turn history if default values are set
+				if (agentSelect.value && seedSelect.value) {
+					loadTurnHistory();
+				}
 			});
 		</script>
 	</body>
