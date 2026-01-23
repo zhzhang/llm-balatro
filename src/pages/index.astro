@@ -351,11 +351,14 @@ for (const run of runMetadata) {
 					To keep up, players can gain power by buying Jokers and deck-modifying power ups that stack the deck in their favor.
 				</p>
 				<p>
-					Balatro is a good test bed for LLM reasoning:
-					- The game is stochastic with an enormous branching factor, requiring probabilistic reasoning to make optimal decisions.
-					- Long sequences of planning and execution are needed to keep up with the exponentially increasing chip requirement.
-					- The game is simple enough that its state can compactly be stringified, and the best move at any given time is usually path agnostic.
-
+					Balatro is an interesting test bed for LLM reasoning:
+				</p>
+				<ul>
+					<li>The game is stochastic with an enormous branching factor, requiring probabilistic reasoning to make optimal decisions.</li>
+					<li>Long sequences of planning and execution are needed to keep up with the exponentially increasing chip requirement.</li>
+					<li>The game is simple enough that its state can compactly be stringified, and the best move at any given time is usually path agnostic.</li>
+				</ul>
+				<p>
 					Good Balatro play requires picking the best move at any state, while how that move may change the trajectory of the game dozens of turns down the line.
 				</p>
 			
@@ -421,7 +424,7 @@ for (const run of runMetadata) {
 				</div>
 
 				<p>
-					I think you'll notice the surprise here immediately: gemini-3-nano trounces both claude-4.5-sonnet and gpt-5.2, and despite going up against bigger, more expensive models.
+					Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2, despite the latter being bigger and more expensive.
 				</p>
 
 				<div class="turn-history-section">
@@ -488,7 +491,7 @@ for (const run of runMetadata) {
 				</div>
 
 				<p>
-					The reason for this gap, Google's greatest weapon in the current AI race: Youtube.
+					The reason for this gap, Google's secret weapon in the current AI race: Youtube.
 					When I originally started the agent development with Claude, performance was poor, and I looked for a textual guide to see if I could hand the manual strategy for success.
 					(I also tried briefly implementing Reflexion, as well as an AlphaEvolve-based evolutionary algorithm)
 
