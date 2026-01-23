@@ -1,6 +1,27 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { db, gameRuns } from 'astro:db';
+
+// Query game runs and organize by agent and seed
+const runs = await db.select().from(gameRuns).all();
+
+// Get unique agents and seeds
+const agents = [...new Set(runs.map(r => r.agent).filter((a): a is string => a !== null && a !== undefined))].sort();
+const seeds = [...new Set(runs.map(r => r.seed).filter((s): s is string => s !== null && s !== undefined))].sort();
+
+// Create a map for quick lookup: agent -> seed -> outcome
+const outcomeMap = new Map<string, Map<string, string>>();
+for (const run of runs) {
+	if (!run.agent || !run.seed) continue;
+	
+	if (!outcomeMap.has(run.agent)) {
+		outcomeMap.set(run.agent, new Map());
+	}
+	
+	const outcome = run.won === 1 ? 'WON' : `Ante ${run.finalAnte ?? '?'}`;
+	outcomeMap.get(run.agent)!.set(run.seed, outcome);
+}
 ---
 
 <!doctype html>
@@ -32,9 +53,51 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				font-family: 'Lora', Georgia, serif;
 			}
 			
-			.article-content {
-				line-height: 1.8;
-			}
+		.article-content {
+			line-height: 1.8;
+		}
+		
+		.table-container {
+			margin: 2rem 0;
+			overflow-x: auto;
+		}
+		
+		.outcomes-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.9rem;
+		}
+		
+		.outcomes-table th,
+		.outcomes-table td {
+			padding: 0.75rem;
+			text-align: center;
+			border: 1px solid var(--border-light);
+		}
+		
+		.outcomes-table thead th {
+			background-color: var(--bg-secondary);
+			font-weight: 600;
+			position: sticky;
+			top: 0;
+		}
+		
+		.outcomes-table tbody th {
+			background-color: var(--bg-secondary);
+			font-weight: 600;
+			text-align: left;
+		}
+		
+		.outcomes-table td.won {
+			background-color: rgba(34, 197, 94, 0.1);
+			color: rgb(34, 197, 94);
+			font-weight: 600;
+		}
+		
+		.outcomes-table td.lost {
+			background-color: rgba(239, 68, 68, 0.1);
+			color: rgb(239, 68, 68);
+		}
 			
 	.byline {
 		font-size: 0.9rem;
@@ -85,7 +148,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 			<header class="article-header">
 				<h1>Can LLMs beat Balatro?</h1>
 				<p class="article-subtitle">
-					In short: yes, with a surprise performance gap between the model providers.
+					In short: yes, and now I'm betting on Google to win the AI race.
 				</p>
 			<p class="byline">
 				<a href="https://www.linkedin.com/in/zhjzhang/" target="_blank" rel="noopener noreferrer">
@@ -106,18 +169,76 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 			
 			<article class="article-content">
 				<p>
-					<strong>Balatro</strong> is a indie roguelike deckbuilder based on poker that was released in 2024.
+					<strong>Balatro</strong> is a roguelike deckbuilder based on poker that was released in 2024.
 					Players play poker hands to earn chips and pass rounds, trying to pass an exponentially increasing chip requirement as rounds progress.
 					To keep up, players can gain power by buying Jokers and deck-modifying power ups that stack the deck in their favor.
 				</p>
 				<p>
-					Balatro is an excellent test bed for LLM reasoning because:
+					Balatro is a good test bed for LLM reasoning:
 					- The game is stochastic with an enormous branching factor, requiring probabilistic reasoning to make optimal decisions.
 					- Long sequences of planning and execution are needed to keep up with the exponentially increasing chip requirement.
 					- The game is simple enough that its state can compactly be stringified, and the best move at any given time is usually path agnostic.
+
+					Good Balatro play requires picking the best move at any state, while how that move may change the trajectory of the game dozens of turns down the line.
+				</p>
+			
+				<div class="table-container">
+					<table class="outcomes-table">
+						<thead>
+							<tr>
+								<th>Agent</th>
+								{seeds.map(seed => (
+									<th>{seed}</th>
+								))}
+							</tr>
+						</thead>
+						<tbody>
+							{agents.map(agent => (
+								<tr>
+									<th>{agent}</th>
+									{seeds.map(seed => {
+										const outcome = outcomeMap.get(agent)?.get(seed) ?? '-';
+										const isWon = outcome === 'WON';
+										return (
+											<td class={isWon ? 'won' : 'lost'}>
+												{outcome}
+											</td>
+										);
+									})}
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+
+				<p>
+					I think you'll notice the surprise here immediately: gemini-3-nano trounces both claude-4.5-sonnet and gpt-5.2.
 				</p>
 
-			
+				<p>
+					The reason for this gap, Google's greatest weapon in the current AI race: Youtube.
+					When I originally started the agent development with Claude, performance was poor, and I looked for a textual guide to see if I could hand the manual strategy for success.
+					(I also tried briefly implementing Reflexion, as well as an AlphaEvolve-based evolutionary algorithm)
+
+					Good, comprehensive text-based guides were very hard to find, but Youtube had tons of content from streamers, breaking down strategies and gameplay.
+					When watching gemini play, I noticed within the first couple of Antes that it knew more about the game than the other two models, certainly more than was possible from the state context I was giving it.
+				</p>
+
+				<p>
+					See for yourself by stepping through the screenshots, state, and agent responses of each of the games below.
+				</p>
+
+				<p>
+					Cost per playthrough.
+				</p>
+
+				<p>
+					At the end of the day, the Bitter Lesson is that this AI race is about scaling compute and data, and teams that have access to more and better of both will win.
+
+					This experiment has woken me up to how unfair of an advantage Youtube is in the AI race.
+
+					The sheer amount of high fidelity multi-modal explanations of pretty much any topic you can imagine creates a data moat that companies starting from scraping the internet struggle to match.
+				</p>
 			</article>
 		</main>
 	</body>
