@@ -1,7 +1,7 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { db, gameRuns } from 'astro:db';
+import { db, gameRuns, screenshots, turnHistory, eq, and } from 'astro:db';
 
 // Query game runs and organize by agent and seed
 const runs = await db.select().from(gameRuns).all();
@@ -10,18 +10,30 @@ const runs = await db.select().from(gameRuns).all();
 const agents = [...new Set(runs.map(r => r.agent).filter((a): a is string => a !== null && a !== undefined))].sort();
 const seeds = [...new Set(runs.map(r => r.seed).filter((s): s is string => s !== null && s !== undefined))].sort();
 
-// Create a map for quick lookup: agent -> seed -> outcome
+// Create a map for quick lookup: agent -> seed -> outcome and runId
 const outcomeMap = new Map<string, Map<string, string>>();
+const runIdMap = new Map<string, Map<string, string>>();
 for (const run of runs) {
 	if (!run.agent || !run.seed) continue;
 	
 	if (!outcomeMap.has(run.agent)) {
 		outcomeMap.set(run.agent, new Map());
+		runIdMap.set(run.agent, new Map());
 	}
 	
 	const outcome = run.won === 1 ? 'WON' : `Ante ${run.finalAnte ?? '?'}`;
 	outcomeMap.get(run.agent)!.set(run.seed, outcome);
+	runIdMap.get(run.agent)!.set(run.seed, run.runId);
 }
+
+// Prepare data structure for turn history (will be loaded via client-side)
+const agentSeedData = agents.map(agent => 
+	seeds.map(seed => ({
+		agent,
+		seed,
+		runId: runIdMap.get(agent)?.get(seed)
+	}))
+).flat();
 ---
 
 <!doctype html>
@@ -102,6 +114,137 @@ for (const run of runs) {
 			background-color: rgba(239, 68, 68, 0.1);
 			color: rgb(239, 68, 68);
 		}
+
+		.turn-history-section {
+			margin: 4rem 0;
+			padding: 2rem;
+			background-color: var(--bg-secondary);
+			border-radius: 8px;
+		}
+
+		.turn-history-section h2 {
+			margin-top: 0;
+		}
+
+		.selector-controls {
+			display: flex;
+			gap: 2rem;
+			margin: 2rem 0;
+			flex-wrap: wrap;
+		}
+
+		.control-group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+
+		.control-group label {
+			font-weight: 600;
+			font-size: 0.9rem;
+		}
+
+		.control-group select {
+			padding: 0.5rem;
+			border: 1px solid var(--border-light);
+			border-radius: 4px;
+			background-color: white;
+			font-size: 1rem;
+			min-width: 200px;
+		}
+
+		.turn-browser {
+			margin-top: 2rem;
+		}
+
+		.turn-controls {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 2rem;
+			padding: 1rem;
+			background-color: white;
+			border-radius: 4px;
+		}
+
+		.turn-controls button {
+			padding: 0.75rem 1.5rem;
+			background-color: var(--text-link);
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 1rem;
+			transition: opacity 0.2s ease;
+		}
+
+		.turn-controls button:hover:not(:disabled) {
+			opacity: 0.9;
+		}
+
+		.turn-controls button:disabled {
+			background-color: #ccc;
+			cursor: not-allowed;
+		}
+
+		#turn-counter {
+			font-weight: 600;
+			font-size: 1.1rem;
+		}
+
+		.turn-display {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 2rem;
+		}
+
+		.turn-screenshot {
+			background-color: white;
+			padding: 1.5rem;
+			border-radius: 4px;
+		}
+
+		.turn-screenshot h3 {
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+
+		.turn-screenshot img {
+			width: 100%;
+			height: auto;
+			border: 1px solid var(--border-light);
+			border-radius: 4px;
+		}
+
+		.turn-details {
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+		}
+
+		.detail-section {
+			background-color: white;
+			padding: 1.5rem;
+			border-radius: 4px;
+		}
+
+		.detail-section h3 {
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+
+		.code-block {
+			background-color: #f5f5f5;
+			padding: 1rem;
+			border-radius: 4px;
+			overflow-x: auto;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+			font-family: 'Courier New', monospace;
+			font-size: 0.85rem;
+			line-height: 1.5;
+			margin: 0;
+		}
 			
 	.byline {
 		font-size: 0.9rem;
@@ -148,6 +291,32 @@ for (const run of runs) {
 			.table-container {
 				width: calc(100vw - 3rem);
 				overflow-x: auto;
+			}
+
+			.turn-history-section {
+				padding: 1.5rem;
+			}
+
+			.selector-controls {
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.control-group select {
+				min-width: 100%;
+			}
+
+			.turn-display {
+				grid-template-columns: 1fr;
+			}
+
+			.turn-controls {
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.turn-controls button {
+				width: 100%;
 			}
 		}
 		</style>
@@ -221,8 +390,71 @@ for (const run of runs) {
 				</div>
 
 				<p>
-					I think you'll notice the surprise here immediately: gemini-3-nano trounces both claude-4.5-sonnet and gpt-5.2.
+					I think you'll notice the surprise here immediately: gemini-3-nano trounces both claude-4.5-sonnet and gpt-5.2, and this is despite going up against bigger and more expensive models.
 				</p>
+
+				<div class="turn-history-section">
+					<h2>Explore Agent Turn History</h2>
+					<p>Select an agent and seed to browse through the turn-by-turn gameplay.</p>
+					
+					<div class="selector-controls">
+						<div class="control-group">
+							<label for="agent-select">Agent:</label>
+							<select id="agent-select">
+								<option value="">-- Select Agent --</option>
+								{agents.map(agent => (
+									<option value={agent}>{agent}</option>
+								))}
+							</select>
+						</div>
+						
+						<div class="control-group">
+							<label for="seed-select">Seed:</label>
+							<select id="seed-select">
+								<option value="">-- Select Seed --</option>
+								{seeds.map(seed => (
+									<option value={seed}>{seed}</option>
+								))}
+							</select>
+						</div>
+					</div>
+
+					<div id="turn-browser" class="turn-browser" style="display: none;">
+						<div class="turn-controls">
+							<button id="prev-turn" disabled>← Previous Turn</button>
+							<span id="turn-counter">Turn 0 / 0</span>
+							<button id="next-turn" disabled>Next Turn →</button>
+						</div>
+
+						<div class="turn-display">
+							<div class="turn-screenshot">
+								<h3>Game State Screenshot</h3>
+								<img id="screenshot-img" alt="Game state screenshot" />
+							</div>
+
+							<div class="turn-details">
+								<div class="detail-section">
+									<h3>State Text</h3>
+									<pre id="state-text" class="code-block"></pre>
+								</div>
+
+								<div class="detail-section">
+									<h3>Agent Action</h3>
+									<pre id="action-text" class="code-block"></pre>
+								</div>
+
+								<div class="detail-section">
+									<h3>Agent Reasoning</h3>
+									<pre id="reasoning-text" class="code-block"></pre>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="loading-message" style="display: none; text-align: center; padding: 2rem;">
+						Loading turn history...
+					</div>
+				</div>
 
 				<p>
 					The reason for this gap, Google's greatest weapon in the current AI race: Youtube.
@@ -250,5 +482,137 @@ for (const run of runs) {
 				</p>
 			</article>
 		</main>
+
+		<script define:vars={{ agentSeedData }}>
+			// Map of agent+seed to runId
+			const runIdLookup = new Map();
+			agentSeedData.forEach(({ agent, seed, runId }) => {
+				if (runId) {
+					runIdLookup.set(`${agent}:${seed}`, runId);
+				}
+			});
+
+			let currentTurns = [];
+			let currentTurnIndex = 0;
+
+			const agentSelect = document.getElementById('agent-select');
+			const seedSelect = document.getElementById('seed-select');
+			const turnBrowser = document.getElementById('turn-browser');
+			const loadingMessage = document.getElementById('loading-message');
+			const prevButton = document.getElementById('prev-turn');
+			const nextButton = document.getElementById('next-turn');
+			const turnCounter = document.getElementById('turn-counter');
+			const screenshotImg = document.getElementById('screenshot-img');
+			const stateText = document.getElementById('state-text');
+			const actionText = document.getElementById('action-text');
+			const reasoningText = document.getElementById('reasoning-text');
+
+			async function loadTurnHistory() {
+				const agent = agentSelect.value;
+				const seed = seedSelect.value;
+
+				if (!agent || !seed) {
+					turnBrowser.style.display = 'none';
+					return;
+				}
+
+				const runId = runIdLookup.get(`${agent}:${seed}`);
+				if (!runId) {
+					alert('No run found for this agent and seed combination');
+					return;
+				}
+
+				// Show loading
+				turnBrowser.style.display = 'none';
+				loadingMessage.style.display = 'block';
+
+				try {
+					const response = await fetch(`/api/turn-history?runId=${encodeURIComponent(runId)}`);
+					if (!response.ok) {
+						throw new Error('Failed to fetch turn history');
+					}
+
+					const data = await response.json();
+					currentTurns = data.turns;
+					currentTurnIndex = 0;
+
+					if (currentTurns.length === 0) {
+						alert('No turn history found for this game');
+						loadingMessage.style.display = 'none';
+						return;
+					}
+
+					// Show browser and display first turn
+					loadingMessage.style.display = 'none';
+					turnBrowser.style.display = 'block';
+					displayTurn();
+				} catch (error) {
+					console.error('Error loading turn history:', error);
+					alert('Failed to load turn history. Check console for details.');
+					loadingMessage.style.display = 'none';
+				}
+			}
+
+			function displayTurn() {
+				if (currentTurns.length === 0) return;
+
+				const turn = currentTurns[currentTurnIndex];
+				
+				// Update turn counter
+				turnCounter.textContent = `Turn ${turn.turn}${turn.ante ? ` (Ante ${turn.ante})` : ''} — ${currentTurnIndex + 1} / ${currentTurns.length}`;
+
+				// Update screenshot
+				if (turn.screenshot) {
+					screenshotImg.src = turn.screenshot;
+					screenshotImg.style.display = 'block';
+				} else {
+					screenshotImg.style.display = 'none';
+				}
+
+				// Update state text
+				stateText.textContent = turn.state || 'No state data available';
+
+				// Update action text
+				actionText.textContent = turn.action || 'No action data available';
+
+				// Update reasoning text
+				reasoningText.textContent = turn.reasoning || 'No reasoning data available';
+
+				// Update button states
+				prevButton.disabled = currentTurnIndex === 0;
+				nextButton.disabled = currentTurnIndex === currentTurns.length - 1;
+			}
+
+			function goToPreviousTurn() {
+				if (currentTurnIndex > 0) {
+					currentTurnIndex--;
+					displayTurn();
+				}
+			}
+
+			function goToNextTurn() {
+				if (currentTurnIndex < currentTurns.length - 1) {
+					currentTurnIndex++;
+					displayTurn();
+				}
+			}
+
+			// Event listeners
+			agentSelect.addEventListener('change', loadTurnHistory);
+			seedSelect.addEventListener('change', loadTurnHistory);
+			prevButton.addEventListener('click', goToPreviousTurn);
+			nextButton.addEventListener('click', goToNextTurn);
+
+			// Keyboard navigation
+			document.addEventListener('keydown', (e) => {
+				if (turnBrowser.style.display === 'none') return;
+				
+				if (e.key === 'ArrowLeft') {
+					goToPreviousTurn();
+				} else if (e.key === 'ArrowRight') {
+					goToNextTurn();
+				}
+			});
+		</script>
 	</body>
 </html>
