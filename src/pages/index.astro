@@ -1,39 +1,32 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { db, gameRuns, screenshots, turnHistory, eq, and } from 'astro:db';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
-// Query game runs and organize by agent and seed
-const runs = await db.select().from(gameRuns).all();
+// Load turn history index from static files
+const indexPath = join(process.cwd(), 'public', 'turn-history', 'index.json');
+const indexContent = await readFile(indexPath, 'utf-8');
+const runMetadata = JSON.parse(indexContent) as Array<{
+	agent: string;
+	seed: string;
+	runId: string;
+	outcome: string;
+	turns: number[];
+}>;
 
 // Get unique agents and seeds
-const agents = [...new Set(runs.map(r => r.agent).filter((a): a is string => a !== null && a !== undefined))].sort();
-const seeds = [...new Set(runs.map(r => r.seed).filter((s): s is string => s !== null && s !== undefined))].sort();
+const agents = [...new Set(runMetadata.map(r => r.agent))].sort();
+const seeds = [...new Set(runMetadata.map(r => r.seed))].sort();
 
-// Create a map for quick lookup: agent -> seed -> outcome and runId
+// Create a map for quick lookup: agent -> seed -> outcome
 const outcomeMap = new Map<string, Map<string, string>>();
-const runIdMap = new Map<string, Map<string, string>>();
-for (const run of runs) {
-	if (!run.agent || !run.seed) continue;
-	
+for (const run of runMetadata) {
 	if (!outcomeMap.has(run.agent)) {
 		outcomeMap.set(run.agent, new Map());
-		runIdMap.set(run.agent, new Map());
 	}
-	
-	const outcome = run.won === 1 ? 'WON' : `Ante ${run.finalAnte ?? '?'}`;
-	outcomeMap.get(run.agent)!.set(run.seed, outcome);
-	runIdMap.get(run.agent)!.set(run.seed, run.runId);
+	outcomeMap.get(run.agent)!.set(run.seed, run.outcome);
 }
-
-// Prepare data structure for turn history (will be loaded via client-side)
-const agentSeedData = agents.map(agent => 
-	seeds.map(seed => ({
-		agent,
-		seed,
-		runId: runIdMap.get(agent)?.get(seed)
-	}))
-).flat();
 ---
 
 <!doctype html>
@@ -365,26 +358,58 @@ const agentSeedData = agents.map(agent =>
 						<thead>
 							<tr>
 								<th>Agent</th>
-								{seeds.map(seed => (
-									<th>{seed}</th>
-								))}
+								<th>22V4E3UE</th>
+								<th>2JW2IH4X</th>
+								<th>422J6NUH</th>
+								<th>5U4K91D8</th>
+								<th>84N5GIYF</th>
+								<th>H1Z58VZ6</th>
+								<th>M3F6LPGY</th>
+								<th>M8KADSBQ</th>
+								<th>PE93PR87</th>
+								<th>U15QWQGE</th>
 							</tr>
 						</thead>
 						<tbody>
-							{agents.map(agent => (
-								<tr>
-									<th>{agent}</th>
-									{seeds.map(seed => {
-										const outcome = outcomeMap.get(agent)?.get(seed) ?? '-';
-										const isWon = outcome === 'WON';
-										return (
-											<td class={isWon ? 'won' : 'lost'}>
-												{outcome}
-											</td>
-										);
-									})}
-								</tr>
-							))}
+							<tr>
+								<th>claude</th>
+								<td class="lost">Ante 6</td>
+								<td class="lost">Ante 6</td>
+								<td class="lost">Ante 5</td>
+								<td class="lost">Ante 6</td>
+								<td class="lost">Ante 4</td>
+								<td class="lost">Ante 5</td>
+								<td class="lost">Ante 2</td>
+								<td class="lost">Ante 5</td>
+								<td class="lost">Ante 3</td>
+								<td class="lost">Ante 4</td>
+							</tr>
+							<tr>
+								<th>gemini</th>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="lost">Ante 4</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+							</tr>
+							<tr>
+								<th>openai</th>
+								<td class="lost">Ante 5</td>
+								<td class="lost">Ante 5</td>
+								<td class="lost">Ante 7</td>
+								<td class="lost">Ante 7</td>
+								<td class="won">WON</td>
+								<td class="lost">Ante 6</td>
+								<td class="lost">Ante 4</td>
+								<td class="lost">Ante 5</td>
+								<td class="won">WON</td>
+								<td class="won">WON</td>
+							</tr>
 						</tbody>
 					</table>
 				</div>
@@ -483,135 +508,149 @@ const agentSeedData = agents.map(agent =>
 			</article>
 		</main>
 
-		<script define:vars={{ agentSeedData }}>
-			// Map of agent+seed to runId
-			const runIdLookup = new Map();
-			agentSeedData.forEach(({ agent, seed, runId }) => {
-				if (runId) {
-					runIdLookup.set(`${agent}:${seed}`, runId);
-				}
-			});
+		<script>
+			// Wait for DOM to be ready
+			document.addEventListener('DOMContentLoaded', () => {
+				let currentAgent = '';
+				let currentSeed = '';
+				let currentMetadata = null;
+				let currentTurnIndex = 0;
 
-			let currentTurns = [];
-			let currentTurnIndex = 0;
+				const agentSelect = document.getElementById('agent-select');
+				const seedSelect = document.getElementById('seed-select');
+				const turnBrowser = document.getElementById('turn-browser');
+				const loadingMessage = document.getElementById('loading-message');
+				const prevButton = document.getElementById('prev-turn');
+				const nextButton = document.getElementById('next-turn');
+				const turnCounter = document.getElementById('turn-counter');
+				const screenshotImg = document.getElementById('screenshot-img');
+				const stateText = document.getElementById('state-text');
+				const actionText = document.getElementById('action-text');
+				const reasoningText = document.getElementById('reasoning-text');
 
-			const agentSelect = document.getElementById('agent-select');
-			const seedSelect = document.getElementById('seed-select');
-			const turnBrowser = document.getElementById('turn-browser');
-			const loadingMessage = document.getElementById('loading-message');
-			const prevButton = document.getElementById('prev-turn');
-			const nextButton = document.getElementById('next-turn');
-			const turnCounter = document.getElementById('turn-counter');
-			const screenshotImg = document.getElementById('screenshot-img');
-			const stateText = document.getElementById('state-text');
-			const actionText = document.getElementById('action-text');
-			const reasoningText = document.getElementById('reasoning-text');
+				async function loadTurnHistory() {
+					const agent = agentSelect.value;
+					const seed = seedSelect.value;
 
-			async function loadTurnHistory() {
-				const agent = agentSelect.value;
-				const seed = seedSelect.value;
-
-				if (!agent || !seed) {
-					turnBrowser.style.display = 'none';
-					return;
-				}
-
-				const runId = runIdLookup.get(`${agent}:${seed}`);
-				if (!runId) {
-					alert('No run found for this agent and seed combination');
-					return;
-				}
-
-				// Show loading
-				turnBrowser.style.display = 'none';
-				loadingMessage.style.display = 'block';
-
-				try {
-					const response = await fetch(`/api/turn-history?runId=${encodeURIComponent(runId)}`);
-					if (!response.ok) {
-						throw new Error('Failed to fetch turn history');
-					}
-
-					const data = await response.json();
-					currentTurns = data.turns;
-					currentTurnIndex = 0;
-
-					if (currentTurns.length === 0) {
-						alert('No turn history found for this game');
-						loadingMessage.style.display = 'none';
+					if (!agent || !seed) {
+						turnBrowser.style.display = 'none';
 						return;
 					}
 
-					// Show browser and display first turn
-					loadingMessage.style.display = 'none';
-					turnBrowser.style.display = 'block';
-					displayTurn();
-				} catch (error) {
-					console.error('Error loading turn history:', error);
-					alert('Failed to load turn history. Check console for details.');
-					loadingMessage.style.display = 'none';
+					// Show loading
+					turnBrowser.style.display = 'none';
+					loadingMessage.style.display = 'block';
+
+					try {
+						// Load metadata for this agent/seed combination
+						const metadataResponse = await fetch(`/turn-history/${agent}/${seed}/metadata.json`);
+						if (!metadataResponse.ok) {
+							throw new Error('Failed to fetch metadata');
+						}
+
+						currentMetadata = await metadataResponse.json();
+						currentAgent = agent;
+						currentSeed = seed;
+						currentTurnIndex = 0;
+
+						if (!currentMetadata.turns || currentMetadata.turns.length === 0) {
+							alert('No turn history found for this game');
+							loadingMessage.style.display = 'none';
+							return;
+						}
+
+						// Show browser and display first turn
+						loadingMessage.style.display = 'none';
+						turnBrowser.style.display = 'block';
+						await displayTurn();
+					} catch (error) {
+						console.error('Error loading turn history:', error);
+						alert('Failed to load turn history. Check console for details.');
+						loadingMessage.style.display = 'none';
+					}
 				}
-			}
 
-			function displayTurn() {
-				if (currentTurns.length === 0) return;
+				async function displayTurn() {
+					if (!currentMetadata || !currentMetadata.turns.length) return;
 
-				const turn = currentTurns[currentTurnIndex];
-				
-				// Update turn counter
-				turnCounter.textContent = `Turn ${turn.turn}${turn.ante ? ` (Ante ${turn.ante})` : ''} — ${currentTurnIndex + 1} / ${currentTurns.length}`;
+					const turnNumber = currentMetadata.turns[currentTurnIndex];
+					
+					try {
+						// Load turn data
+						const turnResponse = await fetch(`/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.json`);
+						if (!turnResponse.ok) {
+							throw new Error('Failed to fetch turn data');
+						}
+						const turnData = await turnResponse.json();
+						
+						// Update turn counter
+						turnCounter.textContent = `Turn ${turnData.turn}${turnData.ante ? ` (Ante ${turnData.ante})` : ''} — ${currentTurnIndex + 1} / ${currentMetadata.turns.length}`;
 
-				// Update screenshot
-				if (turn.screenshot) {
-					screenshotImg.src = turn.screenshot;
-					screenshotImg.style.display = 'block';
-				} else {
-					screenshotImg.style.display = 'none';
+						// Update screenshot
+						if (turnData.hasScreenshot) {
+							screenshotImg.src = `/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.png`;
+							screenshotImg.style.display = 'block';
+						} else {
+							screenshotImg.style.display = 'none';
+						}
+
+						// Update state text (prettify if it's JSON)
+						if (turnData.state) {
+							try {
+								const stateObj = JSON.parse(turnData.state);
+								stateText.textContent = JSON.stringify(stateObj, null, 2);
+							} catch {
+								stateText.textContent = turnData.state;
+							}
+						} else {
+							stateText.textContent = 'No state data available';
+						}
+
+						// Update action text
+						actionText.textContent = turnData.action || 'No action data available';
+
+						// Update reasoning text
+						reasoningText.textContent = turnData.reasoning || 'No reasoning data available';
+
+						// Update button states
+						prevButton.disabled = currentTurnIndex === 0;
+						nextButton.disabled = currentTurnIndex === currentMetadata.turns.length - 1;
+					} catch (error) {
+						console.error('Error displaying turn:', error);
+						alert('Failed to load turn data');
+					}
 				}
 
-				// Update state text
-				stateText.textContent = turn.state || 'No state data available';
-
-				// Update action text
-				actionText.textContent = turn.action || 'No action data available';
-
-				// Update reasoning text
-				reasoningText.textContent = turn.reasoning || 'No reasoning data available';
-
-				// Update button states
-				prevButton.disabled = currentTurnIndex === 0;
-				nextButton.disabled = currentTurnIndex === currentTurns.length - 1;
-			}
-
-			function goToPreviousTurn() {
-				if (currentTurnIndex > 0) {
-					currentTurnIndex--;
-					displayTurn();
+				async function goToPreviousTurn() {
+					if (currentTurnIndex > 0) {
+						currentTurnIndex--;
+						await displayTurn();
+					}
 				}
-			}
 
-			function goToNextTurn() {
-				if (currentTurnIndex < currentTurns.length - 1) {
-					currentTurnIndex++;
-					displayTurn();
+				async function goToNextTurn() {
+					if (currentMetadata && currentTurnIndex < currentMetadata.turns.length - 1) {
+						currentTurnIndex++;
+						await displayTurn();
+					}
 				}
-			}
 
-			// Event listeners
-			agentSelect.addEventListener('change', loadTurnHistory);
-			seedSelect.addEventListener('change', loadTurnHistory);
-			prevButton.addEventListener('click', goToPreviousTurn);
-			nextButton.addEventListener('click', goToNextTurn);
+				// Event listeners
+				agentSelect.addEventListener('change', loadTurnHistory);
+				seedSelect.addEventListener('change', loadTurnHistory);
+				prevButton.addEventListener('click', goToPreviousTurn);
+				nextButton.addEventListener('click', goToNextTurn);
 
-			// Keyboard navigation
-			document.addEventListener('keydown', (e) => {
-				if (turnBrowser.style.display === 'none') return;
-				
-				if (e.key === 'ArrowLeft') {
-					goToPreviousTurn();
-				} else if (e.key === 'ArrowRight') {
-					goToNextTurn();
-				}
+				// Keyboard navigation
+				document.addEventListener('keydown', (e) => {
+					if (turnBrowser.style.display === 'none') return;
+					
+					if (e.key === 'ArrowLeft') {
+						goToPreviousTurn();
+					} else if (e.key === 'ArrowRight') {
+						goToNextTurn();
+					}
+				});
 			});
 		</script>
 	</body>
