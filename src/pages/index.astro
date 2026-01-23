@@ -59,7 +59,11 @@ for (const run of runs) {
 		
 		.table-container {
 			margin: 2rem 0;
-			overflow-x: auto;
+			width: calc(100vw - 4rem);
+			max-width: 1400px;
+			position: relative;
+			left: 50%;
+			transform: translateX(-50%);
 		}
 		
 		.outcomes-table {
@@ -139,6 +143,11 @@ for (const run of runs) {
 			
 			.article-subtitle {
 				font-size: 1.125rem;
+			}
+			
+			.table-container {
+				width: calc(100vw - 3rem);
+				overflow-x: auto;
 			}
 		}
 		</style>
