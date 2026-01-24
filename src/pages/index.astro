@@ -273,6 +273,62 @@ for (const run of runMetadata) {
 		fill: currentColor;
 	}
 		
+		.term-popover {
+			position: relative;
+			text-decoration: underline;
+			text-decoration-style: dotted;
+			text-decoration-color: var(--text-link);
+			cursor: help;
+			color: inherit;
+		}
+
+		.term-popover::after {
+			content: attr(data-definition);
+			position: absolute;
+			bottom: 100%;
+			left: 50%;
+			transform: translateX(-50%) translateY(-8px);
+			background-color: rgba(0, 0, 0, 0.9);
+			color: white;
+			padding: 0.75rem 1rem;
+			border-radius: 6px;
+			font-size: 0.875rem;
+			line-height: 1.5;
+			white-space: normal;
+			width: max-content;
+			max-width: 280px;
+			text-align: left;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.2s ease, transform 0.2s ease;
+			z-index: 1000;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		}
+
+		.term-popover::before {
+			content: '';
+			position: absolute;
+			bottom: 100%;
+			left: 50%;
+			transform: translateX(-50%) translateY(-2px);
+			border: 6px solid transparent;
+			border-top-color: rgba(0, 0, 0, 0.9);
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.2s ease, transform 0.2s ease;
+			z-index: 1000;
+		}
+
+		.term-popover:hover::after,
+		.term-popover:hover::before {
+			opacity: 1;
+			transform: translateX(-50%) translateY(-4px);
+		}
+
+		.term-popover:hover::before {
+			transform: translateX(-50%) translateY(2px);
+		}
+
 		@media (max-width: 768px) {
 			main {
 				padding: 4rem 1.5rem;
@@ -317,6 +373,11 @@ for (const run of runMetadata) {
 			.turn-controls button {
 				width: 100%;
 			}
+
+			.term-popover::after {
+				max-width: 200px;
+				font-size: 0.8rem;
+			}
 		}
 		</style>
 	</head>
@@ -346,7 +407,7 @@ for (const run of runMetadata) {
 			
 			<article class="article-content">
 				<p>
-					<strong>Balatro</strong> is a roguelike deckbuilder based on poker that was released in 2024.
+					<strong>Balatro</strong> is a <span class="term-popover" data-definition="A game genre where progress is procedurally generated, features permanent death, and requires players to restart from the beginning when they die.">roguelike</span> <span class="term-popover" data-definition="A game genre where players build and customize a deck of cards throughout the game, making strategic choices about which cards to add, remove, or upgrade.">deckbuilder</span> based on poker that was released in 2024.
 					Players play poker hands to earn chips and pass rounds, trying to pass an exponentially increasing chip requirement as rounds progress.
 					To keep up, players can gain power by buying Jokers and deck-modifying power ups that stack the deck in their favor.
 				</p>
@@ -361,6 +422,18 @@ for (const run of runMetadata) {
 				<p>
 					Good Balatro play requires picking the best move at any state, while how that move may change the trajectory of the game dozens of turns down the line.
 				</p>
+
+				<p>
+					The state and the agent's reasoning and actions for the last 3 turns are also given.
+				</p>
+
+				<p>
+					I ran had models from OpenAI, Claude, and Google each play 10 games using the same set of run seeds.
+					I used the maximum thinking effort setting for each model.
+
+					I also include the average cost per turn for each model.
+				</p>				
+
 			
 				<div class="table-container">
 					<table class="outcomes-table">
@@ -504,15 +577,13 @@ for (const run of runMetadata) {
 				</p>
 
 				<p>
-					Cost per playthrough.
-				</p>
-
-				<p>
 					At the end of the day, the Bitter Lesson is that this AI race is about scaling compute and data, and teams that have access to more and better of both will win.
 
 					This experiment has woken me up to how unfair of an advantage Youtube is in the AI race.
 
 					The sheer amount of high fidelity multi-modal explanations of pretty much any topic you can imagine creates a data moat that companies starting from scraping the internet struggle to match.
+
+					If you have the right data for a specific domain, you can create outsize impact for 10x cheaper.
 				</p>
 			</article>
 		</main>
