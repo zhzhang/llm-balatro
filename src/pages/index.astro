@@ -41,6 +41,11 @@ for (const run of runMetadata) {
         outline-offset: -3px;
       }
 
+      /* Turn navigation buttons */
+      .turn-controls button:not(:disabled):hover {
+        background-color: var(--color-border-light) !important;
+      }
+
       /* Term popover tooltips */
       .term-popover::after {
         content: attr(data-definition);
@@ -578,24 +583,54 @@ for (const run of runMetadata) {
             </tbody>
           </table>
 
-          <div id="turn-browser" class="flex max-w-full">
-            <div class="bg-white p-4 rounded">
-              <img
-                id="screenshot-img"
-                alt="Game state screenshot"
-                class="w-full h-auto border rounded block"
-                style="border-color: var(--color-border-light);"
-                src="/turn-history/gemini/84N5GIYF/0.png"
-              />
-            </div>
-            <div class="p-4 max-w-xl">
-              <h3 class="text-lg font-semibold mb-3">Agent Reasoning</h3>
-              <div
-                id="reasoning-text"
-                class="text-sm leading-relaxed whitespace-pre-wrap"
-                style="color: var(--color-text-secondary);"
-              >
-                Loading...
+          <div id="turn-browser" class="max-w-full">
+            <div class="flex">
+              <div class="bg-white p-4 rounded">
+                <div
+                  class="turn-controls grid gap-4 mb-4 items-center"
+                  style="grid-template-columns: auto 1fr auto;"
+                >
+                  <button
+                    id="prev-turn-btn"
+                    class="px-4 py-2 rounded font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style="background-color: var(--color-bg-secondary); border: 1px solid var(--color-border-light);"
+                    disabled
+                  >
+                    ← Previous
+                  </button>
+                  <span
+                    id="turn-indicator"
+                    class="text-center font-medium"
+                    style="color: var(--color-text-secondary);"
+                  >
+                    Turn 1 of 1
+                  </span>
+                  <button
+                    id="next-turn-btn"
+                    class="px-4 py-2 rounded font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style="background-color: var(--color-bg-secondary); border: 1px solid var(--color-border-light);"
+                    disabled
+                  >
+                    Next →
+                  </button>
+                </div>
+                <img
+                  id="screenshot-img"
+                  alt="Game state screenshot"
+                  class="w-full h-auto border rounded block"
+                  style="border-color: var(--color-border-light);"
+                  src="/turn-history/gemini/84N5GIYF/0.png"
+                />
+              </div>
+              <div class="p-4 max-w-xl">
+                <h3 class="text-lg font-semibold mb-3">Agent Reasoning</h3>
+                <div
+                  id="reasoning-text"
+                  class="text-sm leading-relaxed whitespace-pre-wrap"
+                  style="color: var(--color-text-secondary);"
+                >
+                  Loading...
+                </div>
               </div>
             </div>
           </div>
@@ -639,6 +674,117 @@ for (const run of runMetadata) {
       </p>
     </main>
 
-    <script is:inline define:vars={{ runMetadata }}></script>
+    <script is:inline define:vars={{ runMetadata }}>
+      // State for current selection
+      let currentAgent = null;
+      let currentSeed = null;
+      let currentTurnIndex = 0;
+      let currentTurns = [];
+
+      // DOM elements
+      const screenshotImg = document.getElementById("screenshot-img");
+      const reasoningText = document.getElementById("reasoning-text");
+      const turnIndicator = document.getElementById("turn-indicator");
+      const prevBtn = document.getElementById("prev-turn-btn");
+      const nextBtn = document.getElementById("next-turn-btn");
+
+      // Find run metadata by agent and seed
+      function findRun(agent, seed) {
+        return runMetadata.find((r) => r.agent === agent && r.seed === seed);
+      }
+
+      // Update the turn display
+      async function updateTurnDisplay() {
+        if (!currentAgent || !currentSeed || currentTurns.length === 0) return;
+
+        const turn = currentTurns[currentTurnIndex];
+
+        // Update screenshot
+        screenshotImg.src = `/turn-history/${currentAgent}/${currentSeed}/${turn}.png`;
+
+        // Update reasoning
+        try {
+          const response = await fetch(
+            `/turn-history/${currentAgent}/${currentSeed}/${turn}.json`,
+          );
+          const data = await response.json();
+          reasoningText.textContent =
+            data.reasoning || "No reasoning available";
+        } catch (e) {
+          reasoningText.textContent = "Failed to load reasoning";
+        }
+
+        // Update turn indicator
+        turnIndicator.textContent = `Turn ${currentTurnIndex + 1} of ${currentTurns.length}`;
+
+        // Update button states
+        prevBtn.disabled = currentTurnIndex === 0;
+        nextBtn.disabled = currentTurnIndex === currentTurns.length - 1;
+      }
+
+      // Select a run from the table
+      function selectRun(agent, seed) {
+        const run = findRun(agent, seed);
+        if (!run) return;
+
+        // Update selection state
+        currentAgent = agent;
+        currentSeed = seed;
+        currentTurns = run.turns;
+        currentTurnIndex = 0;
+
+        // Clear previous selection
+        document
+          .querySelectorAll("td.selected")
+          .forEach((td) => td.classList.remove("selected"));
+
+        // Highlight selected cell
+        const cell = document.querySelector(
+          `td[data-agent="${agent}"][data-seed="${seed}"]`,
+        );
+        if (cell) cell.classList.add("selected");
+
+        updateTurnDisplay();
+      }
+
+      // Navigation handlers
+      prevBtn.addEventListener("click", () => {
+        if (currentTurnIndex > 0) {
+          currentTurnIndex--;
+          updateTurnDisplay();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentTurnIndex < currentTurns.length - 1) {
+          currentTurnIndex++;
+          updateTurnDisplay();
+        }
+      });
+
+      // Keyboard navigation
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          prevBtn.click();
+        } else if (e.key === "ArrowRight") {
+          nextBtn.click();
+        }
+      });
+
+      // Click handlers for table cells
+      document.querySelectorAll("td.clickable").forEach((cell) => {
+        cell.addEventListener("click", () => {
+          const agent = cell.dataset.agent;
+          const seed = cell.dataset.seed;
+          selectRun(agent, seed);
+        });
+      });
+
+      // Initialize with first available run
+      if (runMetadata.length > 0) {
+        const firstRun = runMetadata[0];
+        selectRun(firstRun.agent, firstRun.seed);
+      }
+    </script>
   </body>
 </html>
