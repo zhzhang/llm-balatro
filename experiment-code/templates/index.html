@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balatro Bot Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-card-hover: #1c2128;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-cyan: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --accent-pink: #db61a2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 20% 0%, rgba(88, 166, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(163, 113, 247, 0.08) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 24px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-link {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-card-hover);
+        }
+
+        .connection-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            box-shadow: 0 0 8px var(--accent-red);
+        }
+
+        .connection-dot.connected {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .stats-inline {
+            display: flex;
+            gap: 16px;
+            margin-left: auto;
+        }
+
+        .stat-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+        }
+
+        .stat-inline .label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-inline .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        button {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-card-hover);
+        }
+
+        button.primary {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: var(--bg-dark);
+        }
+
+        button.primary:hover {
+            background: #4cc45f;
+        }
+
+        button.danger {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: var(--bg-dark);
+        }
+
+        button.danger:hover {
+            background: #ff6b5e;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .pane {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pane-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .pane-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pane-title-icon {
+            font-size: 1.2em;
+        }
+
+        .pane-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75em;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+        }
+
+        .pane-badge.state {
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .pane-badge.response {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .pane-badge.waiting {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .pane-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .turn-indicator {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: var(--bg-dark);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+
+        .state-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .detail-chip {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .detail-chip .label {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .detail-chip .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 16px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 12px;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        .section-title.response::before {
+            background: var(--accent-green);
+        }
+
+        .section-title.reasoning::before {
+            background: var(--accent-orange);
+        }
+
+        .reasoning-block {
+            background: rgba(210, 153, 34, 0.1);
+            border-left: 3px solid var(--accent-orange);
+            padding: 14px 16px;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.7;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .command-block {
+            background: rgba(63, 185, 80, 0.15);
+            border-left: 3px solid var(--accent-green);
+            padding: 14px 16px;
+            border-radius: 0 8px 8px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .state-block {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8em;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .game-state-badge {
+            background: var(--accent-purple);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .no-data {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .no-data-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .waiting-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .waiting-indicator .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .history-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-container {
+            margin-top: 16px;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+
+        .history-item {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .history-item:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .history-item.active {
+            border-color: var(--accent-purple);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+        }
+
+        .history-item-turn {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .history-item-time {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+
+        .run-selector select {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+
+        .run-selector select:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        .run-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .delete-run-btn {
+            padding: 8px 12px;
+            font-size: 0.85em;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .delete-run-btn:hover:not(:disabled) {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            color: white;
+        }
+
+        .delete-run-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .turn-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .turn-nav button {
+            padding: 6px 10px;
+            font-size: 0.8em;
+            border-radius: 4px;
+        }
+
+        .turn-nav button:disabled {
+            opacity: 0.3;
+        }
+
+        .turn-display {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.9em;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .turn-separator {
+            color: var(--text-secondary);
+        }
+
+        #viewing-turn {
+            color: var(--accent-cyan);
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed transparent;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            width: 4ch;
+            text-align: right;
+            padding: 2px 4px;
+            margin: 0;
+            cursor: text;
+            transition: all 0.2s;
+        }
+
+        #viewing-turn:hover {
+            border-bottom-color: var(--accent-cyan);
+            background: rgba(88, 166, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        #viewing-turn:focus {
+            outline: none;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 4px;
+        }
+
+        #viewing-turn::-webkit-inner-spin-button,
+        #viewing-turn::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #viewing-turn[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .live {
+            background: var(--bg-dark) !important;
+            border-color: var(--accent-red) !important;
+            color: var(--accent-red) !important;
+            font-size: 0.75em !important;
+            padding: 6px 10px !important;
+            margin-left: 4px;
+        }
+
+        .live.active {
+            background: var(--accent-red) !important;
+            color: var(--bg-dark) !important;
+            animation: live-pulse 2s infinite;
+        }
+
+        @keyframes live-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .viewing-historical {
+            border-color: var(--accent-orange) !important;
+        }
+
+        .viewing-historical .pane-header {
+            background: rgba(210, 153, 34, 0.1);
+        }
+
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .tab-content {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .raw-json-block {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75em;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-x: auto;
+            color: var(--text-primary);
+        }
+
+        .raw-json-block .json-key {
+            color: var(--accent-cyan);
+        }
+
+        .raw-json-block .json-string {
+            color: var(--accent-green);
+        }
+
+        .raw-json-block .json-number {
+            color: var(--accent-orange);
+        }
+
+        .raw-json-block .json-boolean {
+            color: var(--accent-purple);
+        }
+
+        .raw-json-block .json-null {
+            color: var(--accent-pink);
+        }
+
+        button.restore-btn {
+            background: linear-gradient(135deg, var(--accent-orange), #e67700);
+            border: none;
+            color: white;
+        }
+
+        button.restore-btn:hover {
+            opacity: 0.9;
+        }
+
+        button.restore-btn:disabled {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        button.restore-btn.resume-mode {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+        }
+
+        .restore-status {
+            font-size: 0.85em;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-left: 8px;
+        }
+
+        .restore-status.success {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--accent-green);
+        }
+
+        .restore-status.error {
+            background: rgba(248, 81, 73, 0.2);
+            color: var(--accent-red);
+        }
+
+        /* Screenshot styles */
+        .screenshot-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .screenshot-image {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .screenshot-info {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .screenshot-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .screenshot-loading .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🃏 <span>Balatro Bot Monitor</span></h1>
+            <div class="header-right">
+                <div class="nav-links">
+                    <a href="/history" class="nav-link">📊 Game History</a>
+                    <a href="/notes" class="nav-link">📚 Item Notes</a>
+                </div>
+                <div class="connection-badge">
+                    <div class="connection-dot" id="connection-dot"></div>
+                    <span id="connection-text">Connecting...</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="controls-bar">
+            <button id="start-game-btn" class="primary" onclick="startGame()">▶ Start</button>
+            <button id="stop-game-btn" class="danger" onclick="stopGame()" disabled>⏹ Stop</button>
+            <button id="continue-btn" class="restore-btn" onclick="continueFromCurrentTurn()" disabled title="Continue run from current turn">▶️ Continue Run</button>
+            <span id="restore-status"></span>
+            
+            <div class="run-selector">
+                <select id="run-select" onchange="filterByRun()">
+                </select>
+                <button id="delete-run-btn" class="delete-run-btn" onclick="deleteCurrentRun()" title="Delete this run and all associated data" disabled>🗑️ Delete</button>
+            </div>
+            
+            <div class="turn-nav">
+                <button id="prev-btn" onclick="previousTurn()" title="Previous turn (←)">◀</button>
+                <div class="turn-display">
+                    <input type="number" id="viewing-turn" value="-" min="1" onkeydown="handleTurnInput(event)" onblur="handleTurnBlur()" title="Click to type a turn number, press Enter to jump">
+                    <span class="turn-separator">/</span>
+                    <span id="total-turns">0</span>
+                </div>
+                <button id="next-btn" onclick="nextTurn()" title="Next turn (→)">▶</button>
+                <button id="live-btn" class="live active" onclick="toggleLive()" title="Follow latest">● LIVE</button>
+            </div>
+            
+            <div class="stats-inline">
+                <div class="stat-inline">
+                    <span class="label">Seed</span>
+                    <span class="value" id="current-seed">-</span>
+                </div>
+                <div class="stat-inline">
+                    <span class="label">Agent</span>
+                    <span class="value" id="current-agent">-</span>
+                </div>
+            </div>
+            
+            <div class="stats-inline">
+                <div class="stat-inline">
+                    <span class="label">State</span>
+                    <span class="value" id="current-state">-</span>
+                </div>
+                <div class="stat-inline">
+                    <span class="label">Game</span>
+                    <span class="value" id="game-status">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Pane: Game State -->
+            <div class="pane" id="state-pane">
+                <div class="pane-header">
+                    <div class="pane-title">
+                        <span class="pane-title-icon">📊</span>
+                        Game State
+                    </div>
+                    <div id="state-status">
+                        <span class="pane-badge state">Waiting for state...</span>
+                    </div>
+                </div>
+                <div class="tab-bar">
+                    <button class="tab-btn active" onclick="switchStateTab('formatted')" id="tab-formatted">
+                        📋 Formatted
+                    </button>
+                    <button class="tab-btn" onclick="switchStateTab('screenshot')" id="tab-screenshot">
+                        📸 Screenshot
+                    </button>
+                    <button class="tab-btn" onclick="switchStateTab('raw')" id="tab-raw">
+                        { } Raw JSON
+                    </button>
+                    <button class="tab-btn" onclick="switchStateTab('agent-input')" id="tab-agent-input">
+                        📝 Full Prompt
+                    </button>
+                </div>
+                <div class="pane-body">
+                    <div class="tab-content active" id="state-content-formatted">
+                        <div class="no-data">
+                            <div class="no-data-icon">🎴</div>
+                            <p>Waiting for game state...</p>
+                            <p style="margin-top: 8px; font-size: 0.9em;">Start the game to begin!</p>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="state-content-raw">
+                        <div class="no-data">
+                            <div class="no-data-icon">{ }</div>
+                            <p>Waiting for game state...</p>
+                            <p style="margin-top: 8px; font-size: 0.9em;">Raw JSON will appear here</p>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="state-content-screenshot">
+                        <div class="no-data">
+                            <div class="no-data-icon">📸</div>
+                            <p>Waiting for screenshot...</p>
+                            <p style="margin-top: 8px; font-size: 0.9em;">Game screenshot will appear here</p>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="state-content-agent-input">
+                        <div class="no-data">
+                            <div class="no-data-icon">📝</div>
+                            <p>Waiting for prompt...</p>
+                            <p style="margin-top: 8px; font-size: 0.9em;">Full prompt sent to the agent will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Agent Response -->
+            <div class="pane" id="response-pane">
+                <div class="pane-header">
+                    <div class="pane-title">
+                        <span class="pane-title-icon">🤖</span>
+                        Agent Response
+                    </div>
+                    <div id="response-status">
+                        <span class="pane-badge response">Waiting for response...</span>
+                    </div>
+                </div>
+                <div class="pane-body" id="response-content">
+                    <div class="no-data">
+                        <div class="no-data-icon">💭</div>
+                        <p>Waiting for agent...</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;">Agent will respond after receiving state</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let reconnectTimeout = null;
+        let gameHistory = [];
+        let allRuns = [];
+        let selectedRunId = '';
+        let currentTurn = null;
+        let pendingState = null; // State waiting for response
+        let viewingIndex = 0; // Index in filtered history (0 = most recent)
+        let isLive = true; // Whether to auto-follow latest updates
+
+        function formatTimestamp(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+        }
+
+        function formatGameState(state) {
+            if (!state) return 'Unknown';
+            return state.replace(/_/g, ' ').toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            console.log('Connecting to WebSocket:', wsUrl);
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                updateConnectionStatus(true);
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'history') {
+                    // Initial history load
+                    gameHistory = data.data;
+                    loadRuns();
+                    
+                    // Display the most recent complete entry
+                    if (gameHistory.length > 0) {
+                        viewingIndex = 0;
+                        displayCurrentTurn();
+                    }
+                    updateNavigation();
+                } else if (data.type === 'pong') {
+                    // Ignore pong messages
+                } else if (data.type === 'game_state') {
+                    // New state received - display immediately
+                    handleNewState(data);
+                } else if (data.type === 'agent_response') {
+                    // Agent response received
+                    handleAgentResponse(data);
+                } else if (data.type === 'reflection') {
+                    // Reflection generated for a completed game
+                    handleReflection(data);
+                } else if (!data.type) {
+                    // Legacy combined message (backwards compatibility)
+                    gameHistory.unshift(data);
+                    if (isLive) {
+                        viewingIndex = 0;
+                        displayCurrentTurn();
+                    } else {
+                        // Shift index to keep viewing the same turn
+                        viewingIndex++;
+                    }
+                    updateNavigation();
+                    updateStats();
+                }
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus(false);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket closed');
+                updateConnectionStatus(false);
+                reconnectTimeout = setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function handleNewState(data) {
+            // Show state immediately on the left pane
+            pendingState = data;
+            currentTurn = data.turn;
+            
+            // If this is for a new run and we're in live mode, switch to it
+            if (isLive && data.run_id && data.run_id !== selectedRunId) {
+                selectedRunId = data.run_id;
+                // Immediately update the run selector to show the new run
+                addRunToSelector(data.run_id);
+                // Also refresh the full run list in the background
+                loadRuns();
+            }
+            
+            if (isLive && (!selectedRunId || data.run_id === selectedRunId)) {
+                // Update state status badge
+                const stateStatus = document.getElementById('state-status');
+                stateStatus.innerHTML = `
+                    <span class="turn-indicator">Turn ${data.turn + 1}</span>
+                    <span class="game-state-badge">${formatGameState(data.game_state?.state)}</span>
+                `;
+                
+                // Display the state content
+                displayState(data);
+                
+                // Show waiting indicator on response pane
+                const responseStatus = document.getElementById('response-status');
+                responseStatus.innerHTML = `<span class="pane-badge waiting">Thinking...</span>`;
+                
+                const responseContent = document.getElementById('response-content');
+                responseContent.innerHTML = `
+                    <div class="waiting-indicator">
+                        <div class="spinner"></div>
+                        <p>Agent is analyzing the game state...</p>
+                        <p style="margin-top: 8px; font-size: 0.85em; color: var(--text-secondary);">Turn ${data.turn + 1}</p>
+                    </div>
+                `;
+            }
+            
+            updateStats();
+        }
+
+        function addRunToSelector(runId) {
+            // Immediately add a run to the selector if it doesn't exist
+            const select = document.getElementById('run-select');
+            const existingOption = Array.from(select.options).find(opt => opt.value === runId);
+            
+            if (!existingOption) {
+                const option = document.createElement('option');
+                option.value = runId;
+                option.textContent = `${runId} (new)`;
+                // Insert at the beginning (newest runs first)
+                select.insertBefore(option, select.firstChild);
+            }
+            
+            // Select the run
+            select.value = runId;
+        }
+
+        function handleAgentResponse(data) {
+            // Add to history
+            const combinedEntry = {
+                ...pendingState,
+                ...data,
+                type: 'combined'
+            };
+            gameHistory.unshift(combinedEntry);
+            
+            const isCurrentRun = !selectedRunId || data.run_id === selectedRunId;
+            
+            if (isLive && isCurrentRun) {
+                viewingIndex = 0;
+                // Agent has responded
+                const responseStatus = document.getElementById('response-status');
+                responseStatus.innerHTML = `
+                    <span class="turn-indicator">Turn ${data.turn + 1}</span>
+                    <span class="pane-badge response">Complete</span>
+                `;
+                
+                // Display the response
+                displayResponse(data);
+            } else if (isCurrentRun) {
+                // Shift index to keep viewing the same turn
+                viewingIndex++;
+            }
+            
+            // Update runs if needed
+            const runId = data.run_id;
+            if (runId && !allRuns.find(r => r.run_id === runId)) {
+                loadRuns();
+            }
+            
+            pendingState = null;
+            updateNavigation();
+            updateStats();
+        }
+
+        function syntaxHighlightJson(json) {
+            if (typeof json !== 'string') {
+                json = JSON.stringify(json, null, 2);
+            }
+            // Escape HTML
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            // Add syntax highlighting
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function switchStateTab(tab) {
+            const formattedBtn = document.getElementById('tab-formatted');
+            const screenshotBtn = document.getElementById('tab-screenshot');
+            const rawBtn = document.getElementById('tab-raw');
+            const agentInputBtn = document.getElementById('tab-agent-input');
+            const formattedContent = document.getElementById('state-content-formatted');
+            const screenshotContent = document.getElementById('state-content-screenshot');
+            const rawContent = document.getElementById('state-content-raw');
+            const agentInputContent = document.getElementById('state-content-agent-input');
+
+            // Remove active from all
+            formattedBtn.classList.remove('active');
+            screenshotBtn.classList.remove('active');
+            rawBtn.classList.remove('active');
+            agentInputBtn.classList.remove('active');
+            formattedContent.classList.remove('active');
+            screenshotContent.classList.remove('active');
+            rawContent.classList.remove('active');
+            agentInputContent.classList.remove('active');
+
+            if (tab === 'formatted') {
+                formattedBtn.classList.add('active');
+                formattedContent.classList.add('active');
+            } else if (tab === 'screenshot') {
+                screenshotBtn.classList.add('active');
+                screenshotContent.classList.add('active');
+            } else if (tab === 'raw') {
+                rawBtn.classList.add('active');
+                rawContent.classList.add('active');
+            } else if (tab === 'agent-input') {
+                agentInputBtn.classList.add('active');
+                agentInputContent.classList.add('active');
+            }
+        }
+
+        function displayState(data) {
+            const formattedContent = document.getElementById('state-content-formatted');
+            const screenshotContent = document.getElementById('state-content-screenshot');
+            const rawContent = document.getElementById('state-content-raw');
+            const agentInputContent = document.getElementById('state-content-agent-input');
+            const state = data.game_state;
+            
+            // Formatted view
+            let detailsHtml = '';
+            if (state) {
+                const details = [];
+                
+                if (state.dollars !== undefined) {
+                    details.push(`<div class="detail-chip">
+                        <div class="label">Money</div>
+                        <div class="value">$${state.dollars}</div>
+                    </div>`);
+                }
+                
+                if (state.hands_left !== undefined) {
+                    details.push(`<div class="detail-chip">
+                        <div class="label">Hands</div>
+                        <div class="value">${state.hands_left}</div>
+                    </div>`);
+                }
+                
+                if (state.discards_left !== undefined) {
+                    details.push(`<div class="detail-chip">
+                        <div class="label">Discards</div>
+                        <div class="value">${state.discards_left}</div>
+                    </div>`);
+                }
+                
+                if (state.chips !== undefined) {
+                    details.push(`<div class="detail-chip">
+                        <div class="label">Chips</div>
+                        <div class="value">${state.chips}</div>
+                    </div>`);
+                }
+                
+                if (state.jokers) {
+                    details.push(`<div class="detail-chip">
+                        <div class="label">Jokers</div>
+                        <div class="value">${state.jokers.length}</div>
+                    </div>`);
+                }
+                
+                if (state.consumeables) {
+                    details.push(`<div class="detail-chip">
+                        <div class="label">Consumables</div>
+                        <div class="value">${state.consumeables.length}</div>
+                    </div>`);
+                }
+                
+                if (details.length > 0) {
+                    detailsHtml = `<div class="state-details">${details.join('')}</div>`;
+                }
+            }
+            
+            formattedContent.innerHTML = `
+                ${detailsHtml}
+                <div class="section">
+                    <div class="section-title">Full Game State</div>
+                    <div class="state-block">${data.state_string || 'No state information'}</div>
+                </div>
+            `;
+
+            // Screenshot view
+            const runId = data.run_id;
+            const turn = data.turn;
+            if (runId !== undefined && turn !== undefined) {
+                // Show loading state first
+                screenshotContent.innerHTML = `
+                    <div class="screenshot-loading">
+                        <div class="spinner"></div>
+                        <p>Loading screenshot...</p>
+                    </div>
+                `;
+                
+                // Load screenshot from API
+                loadScreenshot(runId, turn);
+            } else {
+                screenshotContent.innerHTML = `
+                    <div class="no-data">
+                        <div class="no-data-icon">📸</div>
+                        <p>No screenshot available</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;">Screenshot data is missing</p>
+                    </div>
+                `;
+            }
+
+            // Raw JSON view
+            const rawJson = state ? syntaxHighlightJson(state) : 'No state data available';
+            rawContent.innerHTML = `
+                <div class="raw-json-block">${rawJson}</div>
+            `;
+
+            // Full Prompt view - show the complete prompt sent to the agent
+            const promptText = data.prompt || data.full_prompt || 'No prompt available';
+            agentInputContent.innerHTML = `
+                <div class="section">
+                    <div class="section-title">Complete Prompt</div>
+                    <div class="state-block">${escapeHtml(promptText)}</div>
+                </div>
+            `;
+        }
+
+        async function loadScreenshot(runId, turn) {
+            const screenshotContent = document.getElementById('state-content-screenshot');
+            const screenshotUrl = `/api/runs/${runId}/screenshots/${turn}`;
+            
+            try {
+                const response = await fetch(screenshotUrl);
+                
+                if (response.ok && response.headers.get('content-type')?.includes('image/png')) {
+                    // Create blob URL for the image
+                    const blob = await response.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+                    
+                    screenshotContent.innerHTML = `
+                        <div class="screenshot-container">
+                            <img src="${imageUrl}" alt="Game Screenshot" class="screenshot-image" onclick="openScreenshotFullscreen('${imageUrl}')" title="Click to view fullscreen">
+                            <div class="screenshot-info">
+                                Turn ${turn + 1} • Run ${runId} • Click to enlarge
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    screenshotContent.innerHTML = `
+                        <div class="no-data">
+                            <div class="no-data-icon">📸</div>
+                            <p>No screenshot available for this turn</p>
+                            <p style="margin-top: 8px; font-size: 0.9em;">Screenshot may not have been captured</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading screenshot:', error);
+                screenshotContent.innerHTML = `
+                    <div class="no-data">
+                        <div class="no-data-icon">⚠️</div>
+                        <p>Failed to load screenshot</p>
+                        <p style="margin-top: 8px; font-size: 0.9em;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function openScreenshotFullscreen(imageUrl) {
+            // Open the screenshot in a new tab for fullscreen viewing
+            window.open(imageUrl, '_blank');
+        }
+
+        function displayResponse(data) {
+            const responseContent = document.getElementById('response-content');
+            const command = data.action ? `${data.action} ${(data.positions || []).join(' ')}`.trim() : 'No command';
+            
+            responseContent.innerHTML = `
+                <div class="section">
+                    <div class="section-title response">Command</div>
+                    <div class="command-block">${command}</div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title reasoning">Reasoning</div>
+                    <div class="reasoning-block">${data.reasoning || 'No reasoning provided'}</div>
+                </div>
+            `;
+        }
+
+        function displayStateFromHistory(item) {
+            const stateStatus = document.getElementById('state-status');
+            const turnNum = item.turn !== undefined ? item.turn + 1 : 1;
+            stateStatus.innerHTML = `
+                <span class="turn-indicator">Turn ${turnNum}</span>
+                <span class="game-state-badge">${formatGameState(item.game_state?.state)}</span>
+            `;
+            
+            displayState(item);
+        }
+
+        function displayResponseFromHistory(item) {
+            const responseStatus = document.getElementById('response-status');
+            const turnNum = item.turn !== undefined ? item.turn + 1 : 1;
+            
+            if (item.action) {
+                responseStatus.innerHTML = `
+                    <span class="turn-indicator">Turn ${turnNum}</span>
+                    <span class="pane-badge response">Complete</span>
+                `;
+                displayResponse(item);
+            } else {
+                responseStatus.innerHTML = `<span class="pane-badge waiting">Pending...</span>`;
+            }
+        }
+        
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-text');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                text.textContent = 'Connected';
+            } else {
+                dot.classList.remove('connected');
+                text.textContent = 'Disconnected';
+            }
+        }
+
+        async function loadRuns() {
+            try {
+                const response = await fetch('/api/runs');
+                allRuns = await response.json();
+                updateRunSelector();
+            } catch (error) {
+                console.error('Error loading runs:', error);
+            }
+        }
+
+        function updateRunSelector() {
+            const select = document.getElementById('run-select');
+            const currentValue = select.value || selectedRunId;
+            
+            select.innerHTML = '';
+            
+            // Check if we need to add the current run (might not be in API response yet)
+            const hasCurrentRun = allRuns.find(r => r.run_id === currentValue);
+            if (currentValue && !hasCurrentRun) {
+                // Add the current run at the top (it's new and not in the DB response yet)
+                const option = document.createElement('option');
+                option.value = currentValue;
+                option.textContent = `${currentValue} (new)`;
+                select.appendChild(option);
+            }
+            
+            allRuns.forEach(run => {
+                const option = document.createElement('option');
+                option.value = run.run_id;
+                option.textContent = `${run.run_id} (${run.total_turns} turns)`;
+                select.appendChild(option);
+            });
+            
+            // Restore selection
+            if (currentValue) {
+                select.value = currentValue;
+            } else if (allRuns.length > 0) {
+                select.value = allRuns[0].run_id;
+                selectedRunId = allRuns[0].run_id;
+            }
+            
+            // Update run info display
+            updateRunInfo();
+        }
+
+        function filterByRun() {
+            selectedRunId = document.getElementById('run-select').value;
+            viewingIndex = 0;
+            isLive = true;
+            updateLiveButton();
+
+            // Update seed and agent display
+            updateRunInfo();
+
+            // Filter and display latest from selection
+            displayCurrentTurn();
+            updateNavigation();
+            updateStats();
+
+            // Enable/disable delete button based on selection
+            const deleteBtn = document.getElementById('delete-run-btn');
+            deleteBtn.disabled = !selectedRunId;
+        }
+        
+        function updateRunInfo() {
+            const run = allRuns.find(r => r.run_id === selectedRunId);
+            const seedEl = document.getElementById('current-seed');
+            const agentEl = document.getElementById('current-agent');
+            
+            if (run) {
+                seedEl.textContent = run.seed || '-';
+                agentEl.textContent = run.agent || '-';
+            } else {
+                seedEl.textContent = '-';
+                agentEl.textContent = '-';
+            }
+        }
+
+        function getFilteredHistory() {
+            if (!selectedRunId) {
+                // If no run selected yet, use the most recent run
+                if (allRuns.length > 0) {
+                    selectedRunId = allRuns[0].run_id;
+                } else {
+                    return gameHistory;
+                }
+            }
+            return gameHistory.filter(item => item.run_id === selectedRunId);
+        }
+
+        function displayCurrentTurn() {
+            const filtered = getFilteredHistory();
+            if (filtered.length > 0 && viewingIndex < filtered.length) {
+                const item = filtered[viewingIndex];
+                displayStateFromHistory(item);
+                displayResponseFromHistory(item);
+                updatePaneStyles();
+            }
+        }
+
+        function updateNavigation() {
+            const filtered = getFilteredHistory();
+            const total = filtered.length;
+            
+            document.getElementById('total-turns').textContent = total;
+            
+            if (total > 0) {
+                // Display turn number (1-indexed, showing actual turn not index)
+                const currentItem = filtered[viewingIndex];
+                const turnNum = currentItem?.turn !== undefined ? currentItem.turn + 1 : total - viewingIndex;
+                document.getElementById('viewing-turn').value = turnNum;
+            } else {
+                document.getElementById('viewing-turn').value = '-';
+            }
+            
+            // Update button states
+            document.getElementById('prev-btn').disabled = viewingIndex >= filtered.length - 1;
+            document.getElementById('next-btn').disabled = viewingIndex <= 0;
+        }
+
+        function previousTurn() {
+            const filtered = getFilteredHistory();
+            if (viewingIndex < filtered.length - 1) {
+                viewingIndex++;
+                isLive = false;
+                updateLiveButton();
+                displayCurrentTurn();
+                updateNavigation();
+            }
+        }
+
+        function nextTurn() {
+            if (viewingIndex > 0) {
+                viewingIndex--;
+                if (viewingIndex === 0) {
+                    isLive = true;
+                    updateLiveButton();
+                }
+                displayCurrentTurn();
+                updateNavigation();
+            }
+        }
+
+        function goToTurn(index) {
+            const filtered = getFilteredHistory();
+            if (index >= 0 && index < filtered.length) {
+                viewingIndex = index;
+                isLive = (index === 0);
+                updateLiveButton();
+                displayCurrentTurn();
+                updateNavigation();
+            }
+        }
+
+        function goToTurnNumber(turnNum) {
+            const filtered = getFilteredHistory();
+            // Find the index in filtered array that has this turn number
+            const targetIndex = filtered.findIndex(item => item.turn + 1 === turnNum);
+            if (targetIndex !== -1) {
+                goToTurn(targetIndex);
+            } else {
+                // Turn number not found, refresh display to show current value
+                updateNavigation();
+            }
+        }
+
+        function handleTurnInput(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const input = event.target;
+                const turnNum = parseInt(input.value, 10);
+                if (!isNaN(turnNum) && turnNum >= 1) {
+                    goToTurnNumber(turnNum);
+                }
+                input.blur();
+            } else if (event.key === 'Escape') {
+                event.target.blur();
+            }
+        }
+
+        function handleTurnBlur() {
+            // Restore the current turn number when focus leaves
+            updateNavigation();
+        }
+
+        function toggleLive() {
+            if (!isLive) {
+                // Jump to latest
+                viewingIndex = 0;
+                isLive = true;
+                displayCurrentTurn();
+                updateNavigation();
+            }
+            updateLiveButton();
+        }
+
+        function updateLiveButton() {
+            const btn = document.getElementById('live-btn');
+            if (isLive) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        function updatePaneStyles() {
+            const statePane = document.getElementById('state-pane');
+            const responsePane = document.getElementById('response-pane');
+            
+            if (!isLive) {
+                statePane.classList.add('viewing-historical');
+                responsePane.classList.add('viewing-historical');
+            } else {
+                statePane.classList.remove('viewing-historical');
+                responsePane.classList.remove('viewing-historical');
+            }
+        }
+
+        function updateStats() {
+            const filtered = getFilteredHistory();
+            
+            if (filtered.length > 0 && viewingIndex < filtered.length) {
+                const viewing = filtered[viewingIndex];
+                document.getElementById('current-state').textContent = 
+                    formatGameState(viewing.game_state?.state || 'Unknown');
+            } else {
+                document.getElementById('current-state').textContent = '-';
+            }
+        }
+
+        async function startGame() {
+            try {
+                const response = await fetch('/game/start', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.status === 'started' || data.status === 'already_running') {
+                    console.log('Game started successfully!');
+                    await checkGameStatus();
+                } else {
+                    console.error('Failed to start game:', data.message || data.status);
+                }
+            } catch (error) {
+                console.error('Error starting game:', error);
+            }
+        }
+
+        async function stopGame() {
+            try {
+                const response = await fetch('/game/stop', { method: 'POST' });
+                const data = await response.json();
+                console.log('Game stopped:', data.status);
+                await checkGameStatus();
+            } catch (error) {
+                console.error('Error stopping game:', error);
+            }
+        }
+
+        async function checkGameStatus() {
+            try {
+                const response = await fetch('/game/status');
+                const data = await response.json();
+                
+                const statusElement = document.getElementById('game-status');
+                const startBtn = document.getElementById('start-game-btn');
+                const stopBtn = document.getElementById('stop-game-btn');
+                
+                if (data.status === 'running') {
+                    statusElement.textContent = 'Running';
+                    statusElement.style.color = 'var(--accent-green)';
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                } else if (data.status === 'not_started' || data.status === 'stopped') {
+                    statusElement.textContent = 'Stopped';
+                    statusElement.style.color = 'var(--text-secondary)';
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                } else {
+                    statusElement.textContent = 'Unknown';
+                    startBtn.disabled = false;
+                    stopBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error checking game status:', error);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            // Don't intercept if user is typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousTurn();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextTurn();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                // Go to oldest
+                const filtered = getFilteredHistory();
+                goToTurn(filtered.length - 1);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                // Go to latest (live)
+                goToTurn(0);
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            connectWebSocket();
+            checkGameStatus();
+            loadRuns();
+            
+            // Periodically check game status
+            setInterval(checkGameStatus, 5000);
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (ws) {
+                ws.close();
+            }
+            if (reconnectTimeout) {
+                clearTimeout(reconnectTimeout);
+            }
+        });
+
+        function handleReflection(data) {
+            console.log('Reflection received for run:', data.run_id);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Continue Run Functions
+        let currentSnapshotExists = false;
+        let currentRunFinished = false;
+
+        async function checkSnapshotExists(runId, turn) {
+            try {
+                const response = await fetch(`/api/runs/${runId}/snapshots`);
+                const snapshots = await response.json();
+                return snapshots.some(s => s.turn === turn);
+            } catch (error) {
+                console.error('Error checking snapshots:', error);
+                return false;
+            }
+        }
+
+        async function checkRunFinished(runId) {
+            try {
+                const response = await fetch(`/api/runs/${runId}/finished`);
+                const data = await response.json();
+                return data.finished;
+            } catch (error) {
+                console.error('Error checking if run is finished:', error);
+                return false;
+            }
+        }
+
+        async function updateContinueButton() {
+            const filtered = getFilteredHistory();
+            const continueBtn = document.getElementById('continue-btn');
+            const statusSpan = document.getElementById('restore-status');
+            
+            // Clear any previous status
+            statusSpan.textContent = '';
+            statusSpan.className = 'restore-status';
+            
+            if (filtered.length === 0 || viewingIndex >= filtered.length) {
+                continueBtn.disabled = true;
+                continueBtn.textContent = '▶️ Continue Run';
+                continueBtn.classList.remove('resume-mode');
+                currentSnapshotExists = false;
+                currentRunFinished = false;
+                return;
+            }
+            
+            const item = filtered[viewingIndex];
+            const runId = item.run_id;
+            const turn = item.turn;
+            
+            if (!runId || turn === undefined) {
+                continueBtn.disabled = true;
+                continueBtn.textContent = '▶️ Continue Run';
+                continueBtn.classList.remove('resume-mode');
+                currentSnapshotExists = false;
+                currentRunFinished = false;
+                return;
+            }
+            
+            // Check if run is finished (has reflection)
+            currentRunFinished = await checkRunFinished(runId);
+            
+            // Check if snapshot exists for this turn
+            currentSnapshotExists = await checkSnapshotExists(runId, turn);
+            continueBtn.disabled = !currentSnapshotExists;
+            
+            if (currentSnapshotExists) {
+                if (currentRunFinished) {
+                    continueBtn.textContent = '🔄 Resume Run';
+                    continueBtn.title = `Resume finished run from turn ${turn + 1} (will delete game summary)`;
+                    continueBtn.classList.add('resume-mode');
+                } else {
+                    continueBtn.textContent = '▶️ Continue Run';
+                    continueBtn.title = `Continue run from turn ${turn + 1}`;
+                    continueBtn.classList.remove('resume-mode');
+                }
+            } else {
+                continueBtn.textContent = '▶️ Continue Run';
+                continueBtn.title = `No save snapshot available for turn ${turn + 1}`;
+                continueBtn.classList.remove('resume-mode');
+            }
+        }
+
+        async function continueFromCurrentTurn() {
+            const filtered = getFilteredHistory();
+            if (filtered.length === 0 || viewingIndex >= filtered.length) {
+                return;
+            }
+            
+            const item = filtered[viewingIndex];
+            const runId = item.run_id;
+            const turn = item.turn;
+            
+            if (!runId || turn === undefined) {
+                return;
+            }
+            
+            // If this is a finished run, confirm with the user
+            if (currentRunFinished) {
+                const confirmed = confirm(
+                    'This run has a game summary (reflection).\n\n' +
+                    'Resuming will DELETE the summary and all data after turn ' + (turn + 1) + '.\n\n' +
+                    'Continue?'
+                );
+                if (!confirmed) {
+                    return;
+                }
+            }
+            
+            const continueBtn = document.getElementById('continue-btn');
+            const statusSpan = document.getElementById('restore-status');
+            const isResuming = currentRunFinished;
+            
+            continueBtn.disabled = true;
+            continueBtn.textContent = isResuming ? '🔄 Resuming...' : '▶️ Starting...';
+            
+            try {
+                // Call /game/start with run_id and turn to continue the run and start the game
+                const response = await fetch(`/game/start?run_id=${encodeURIComponent(runId)}&turn=${turn}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.status === 'started') {
+                    const actionWord = isResuming ? 'Resuming' : 'Continuing';
+                    statusSpan.textContent = `✓ ${actionWord} from turn ${turn + 1}`;
+                    statusSpan.className = 'restore-status success';
+                    console.log(`${actionWord} run ${runId} from turn ${turn}, game started with PID: ${data.pid}`);
+                    
+                    // Switch to the continued run and go live
+                    selectedRunId = runId;
+                    document.getElementById('run-select').value = runId;
+                    
+                    // Reload history to reflect deleted turns
+                    await reloadHistory();
+                    
+                    // Jump to the most recent turn
+                    viewingIndex = 0;
+                    isLive = true;
+                    updateLiveButton();
+                    displayCurrentTurn();
+                    updateNavigation();
+                    
+                    // Update game status
+                    await checkGameStatus();
+                } else {
+                    statusSpan.textContent = `✗ ${data.message || 'Failed to continue'}`;
+                    statusSpan.className = 'restore-status error';
+                    console.error('Failed to continue:', data.message);
+                }
+            } catch (error) {
+                statusSpan.textContent = `✗ Error: ${error.message}`;
+                statusSpan.className = 'restore-status error';
+                console.error('Error continuing run:', error);
+            } finally {
+                // Reset button state - updateContinueButton will be called again
+                // after history reload to set the correct state
+                continueBtn.textContent = '▶️ Continue Run';
+                continueBtn.classList.remove('resume-mode');
+                continueBtn.disabled = !currentSnapshotExists;
+                
+                // Clear status after a few seconds
+                setTimeout(() => {
+                    statusSpan.textContent = '';
+                    statusSpan.className = 'restore-status';
+                }, 5000);
+            }
+        }
+
+        async function reloadHistory() {
+            try {
+                const response = await fetch('/api/history');
+                gameHistory = await response.json();
+                loadRuns();
+            } catch (error) {
+                console.error('Error reloading history:', error);
+            }
+        }
+
+        async function deleteCurrentRun() {
+            if (!selectedRunId) {
+                return;
+            }
+
+            const run = allRuns.find(r => r.run_id === selectedRunId);
+            const runInfo = run ? `${selectedRunId} (${run.total_turns} turns)` : selectedRunId;
+            
+            const confirmed = confirm(
+                `Delete run ${runInfo}?\n\n` +
+                'This will permanently delete:\n' +
+                '• All turn history (game states and agent replies)\n' +
+                '• All save snapshots\n' +
+                '• All screenshots\n' +
+                '• Run metadata and reflections\n\n' +
+                'This action cannot be undone.'
+            );
+            
+            if (!confirmed) {
+                return;
+            }
+
+            const deleteBtn = document.getElementById('delete-run-btn');
+            const originalText = deleteBtn.textContent;
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = '🗑️ Deleting...';
+
+            try {
+                const response = await fetch(`/api/runs/${encodeURIComponent(selectedRunId)}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log(`Deleted run ${selectedRunId}: ${data.deleted} entries`);
+                    
+                    // Clear selection
+                    selectedRunId = '';
+                    
+                    // Reload history and runs
+                    await reloadHistory();
+                    
+                    // Reset view to show all runs
+                    const select = document.getElementById('run-select');
+                    select.value = '';
+                    
+                    // Clear current display
+                    viewingIndex = 0;
+                    isLive = true;
+                    updateLiveButton();
+                    displayCurrentTurn();
+                    updateNavigation();
+                    updateStats();
+                } else {
+                    alert(`Failed to delete run: ${data.message || 'Unknown error'}`);
+                    console.error('Failed to delete run:', data);
+                }
+            } catch (error) {
+                alert(`Error deleting run: ${error.message}`);
+                console.error('Error deleting run:', error);
+            } finally {
+                deleteBtn.textContent = originalText;
+                deleteBtn.disabled = !selectedRunId;
+            }
+        }
+
+        // Update the original displayCurrentTurn to also check for snapshot
+        const originalDisplayCurrentTurn = displayCurrentTurn;
+        displayCurrentTurn = function() {
+            originalDisplayCurrentTurn();
+            updateContinueButton();
+        };
+    </script>
+</body>
+</html>

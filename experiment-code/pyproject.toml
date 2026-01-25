@@ -1,0 +1,13 @@
+[project]
+name = "calderu"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.75.0",
+    "fastapi[standard]>=0.121.0",
+    "google-genai>=1.57.0",
+    "openai>=2.15.0",
+    "pydantic>=2.12.4",
+]

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game History - Balatro Bot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-card-hover: #1c2128;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-cyan: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --accent-pink: #db61a2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 30% 10%, rgba(163, 113, 247, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 90%, rgba(219, 97, 162, 0.08) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.6em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-link {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-card-hover);
+        }
+
+        /* Aggregate Stats Banner */
+        .aggregate-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.1), rgba(219, 97, 162, 0.1));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .agg-stat {
+            text-align: center;
+            padding: 16px;
+        }
+
+        .agg-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .agg-stat-label {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* Game Card Styles */
+        .game-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .game-card:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 4px 24px rgba(163, 113, 247, 0.15);
+        }
+
+        .game-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.12), rgba(88, 166, 255, 0.08));
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .game-card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .game-run-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 1.15em;
+            color: var(--accent-purple);
+        }
+
+        .current-badge {
+            color: var(--accent-cyan);
+            font-size: 0.8em;
+            background: rgba(88, 166, 255, 0.15);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .game-stats-inline {
+            display: flex;
+            gap: 14px;
+        }
+
+        .game-stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 24px;
+            font-size: 0.9em;
+        }
+
+        .game-stat-chip .stat-icon {
+            font-size: 1em;
+        }
+
+        .game-stat-chip .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .game-card-header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .game-timestamp {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .game-duration {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            background: var(--bg-dark);
+            border-radius: 14px;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .game-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .game-card-body {
+            display: none;
+            padding: 0;
+        }
+
+        .game-card.expanded .game-card-body {
+            display: block;
+        }
+
+        .game-detail-section {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .game-detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .game-detail-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .game-detail-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            border-radius: 2px;
+        }
+
+        .game-detail-title.stats::before {
+            background: var(--accent-cyan);
+        }
+
+        .game-detail-title.plan::before {
+            background: var(--accent-green);
+        }
+
+        .game-detail-title.reflection::before {
+            background: var(--accent-orange);
+        }
+
+        .game-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .game-stat-box {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-stat-box .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .game-stat-box .label {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .game-plan-content, .game-reflection-content {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            line-height: 1.8;
+            font-size: 0.95em;
+            white-space: pre-wrap;
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        .game-plan-content {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .game-reflection-content {
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .no-content {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .no-games {
+            text-align: center;
+            padding: 80px 24px;
+            color: var(--text-secondary);
+        }
+
+        .no-games-icon {
+            font-size: 5em;
+            margin-bottom: 24px;
+            opacity: 0.4;
+        }
+
+        .no-games h3 {
+            font-size: 1.4em;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .no-games p {
+            line-height: 1.7;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px;
+            color: var(--text-secondary);
+        }
+
+        .loading .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .game-card-header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .game-card-header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .aggregate-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 <span>Game History & Insights</span></h1>
+            <div class="nav-links">
+                <a href="/" class="nav-link">🎮 Game Monitor</a>
+                <a href="/notes" class="nav-link">📚 Item Notes</a>
+            </div>
+        </header>
+
+        <div id="history-content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading game history...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadGameHistory() {
+            const content = document.getElementById('history-content');
+            
+            try {
+                const response = await fetch('/api/reflections');
+                const games = await response.json();
+                
+                if (games.length === 0) {
+                    content.innerHTML = `
+                        <div class="no-games">
+                            <div class="no-games-icon">🎴</div>
+                            <h3>No completed games yet</h3>
+                            <p>Complete a game to see your stats, plans, and reflections here!</p>
+                            <p style="margin-top: 16px; font-size: 0.9em;">
+                                The agent will analyze each game and provide insights on what worked and what could be improved.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Calculate aggregate stats
+                const totalGames = games.length;
+                const avgAnte = games.reduce((sum, g) => sum + (g.final_ante || 0), 0) / totalGames;
+                const maxAnte = Math.max(...games.map(g => g.final_ante || 0));
+                const bestHand = Math.max(...games.map(g => g.best_hand || 0));
+                const gamesWithPlan = games.filter(g => g.game_plan).length;
+                
+                let html = `
+                    <div class="aggregate-stats">
+                        <div class="agg-stat">
+                            <div class="agg-stat-value">${totalGames}</div>
+                            <div class="agg-stat-label">Games Played</div>
+                        </div>
+                        <div class="agg-stat">
+                            <div class="agg-stat-value">${avgAnte.toFixed(1)}</div>
+                            <div class="agg-stat-label">Avg Ante Reached</div>
+                        </div>
+                        <div class="agg-stat">
+                            <div class="agg-stat-value">${maxAnte}</div>
+                            <div class="agg-stat-label">Best Ante</div>
+                        </div>
+                        <div class="agg-stat">
+                            <div class="agg-stat-value">${formatNumber(bestHand)}</div>
+                            <div class="agg-stat-label">Best Hand Score</div>
+                        </div>
+                        <div class="agg-stat">
+                            <div class="agg-stat-value">${Math.round((gamesWithPlan / totalGames) * 100)}%</div>
+                            <div class="agg-stat-label">Games w/ Plan</div>
+                        </div>
+                    </div>
+                `;
+
+                html += '<div class="game-history-list">';
+                
+                // Games are returned in ASC order, reverse for most recent first
+                const sortedGames = [...games].reverse();
+                
+                sortedGames.forEach((game, index) => {
+                    const duration = formatDuration(game.started_at, game.ended_at);
+                    const dateStr = formatDateShort(game.ended_at || game.started_at);
+                    
+                    html += `
+                        <div class="game-card ${index === 0 ? 'expanded' : ''}" id="game-${game.run_id}">
+                            <div class="game-card-header" onclick="toggleGameCard('${game.run_id}')">
+                                <div class="game-card-header-left">
+                                    <span class="game-run-id">${game.run_id}</span>
+                                    <div class="game-stats-inline">
+                                        <div class="game-stat-chip">
+                                            <span class="stat-icon">🎯</span>
+                                            <span class="stat-value">Ante ${game.final_ante || '-'}</span>
+                                        </div>
+                                        <div class="game-stat-chip">
+                                            <span class="stat-icon">🃏</span>
+                                            <span class="stat-value">Round ${game.final_round || '-'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="game-card-header-right">
+                                    ${duration ? `<span class="game-duration">⏱ ${duration}</span>` : ''}
+                                    <span class="game-timestamp">${dateStr}</span>
+                                    <span class="expand-icon">▼</span>
+                                </div>
+                            </div>
+                            <div class="game-card-body">
+                                <!-- Stats Section -->
+                                <div class="game-detail-section">
+                                    <div class="game-detail-title stats">📈 Game Statistics</div>
+                                    <div class="game-stats-grid">
+                                        <div class="game-stat-box">
+                                            <div class="value">${game.final_ante || '-'}</div>
+                                            <div class="label">Final Ante</div>
+                                        </div>
+                                        <div class="game-stat-box">
+                                            <div class="value">${game.final_round || '-'}</div>
+                                            <div class="label">Final Round</div>
+                                        </div>
+                                        <div class="game-stat-box">
+                                            <div class="value">${game.best_hand ? formatNumber(game.best_hand) : '-'}</div>
+                                            <div class="label">Best Hand</div>
+                                        </div>
+                                        <div class="game-stat-box">
+                                            <div class="value">${duration || '-'}</div>
+                                            <div class="label">Duration</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Plan Section -->
+                                <div class="game-detail-section">
+                                    <div class="game-detail-title plan">🎯 Game Plan</div>
+                                    <div class="game-plan-content">
+                                        ${game.game_plan ? escapeHtml(game.game_plan) : '<span class="no-content">No plan was recorded for this game</span>'}
+                                    </div>
+                                </div>
+                                
+                                <!-- Reflection Section -->
+                                <div class="game-detail-section">
+                                    <div class="game-detail-title reflection">💭 Agent Reflection</div>
+                                    <div class="game-reflection-content">
+                                        ${game.reflection ? escapeHtml(game.reflection) : '<span class="no-content">No reflection available</span>'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                content.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error loading game history:', error);
+                content.innerHTML = `
+                    <div class="no-games">
+                        <div class="no-games-icon">⚠️</div>
+                        <h3>Error loading game history</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatNumber(num) {
+            if (!num) return '-';
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        function formatDuration(startedAt, endedAt) {
+            if (!startedAt || !endedAt) return null;
+            const start = new Date(startedAt);
+            const end = new Date(endedAt);
+            const diffMs = end - start;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffSecs = Math.floor((diffMs % 60000) / 1000);
+            
+            if (diffMins > 0) {
+                return `${diffMins}m ${diffSecs}s`;
+            }
+            return `${diffSecs}s`;
+        }
+
+        function formatDateShort(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function toggleGameCard(runId) {
+            const card = document.getElementById(`game-${runId}`);
+            if (card) {
+                card.classList.toggle('expanded');
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadGameHistory();
+        });
+    </script>
+</body>
+</html>

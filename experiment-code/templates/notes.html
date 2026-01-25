@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balatro Item Notes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-card-hover: #1c2128;
+            --bg-input: #0d1117;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-cyan: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --accent-pink: #db61a2;
+            --accent-gold: #f5c842;
+            --joker-glow: rgba(163, 113, 247, 0.3);
+            --consumable-glow: rgba(88, 166, 255, 0.3);
+            --voucher-glow: rgba(245, 200, 66, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 10% 20%, rgba(163, 113, 247, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(245, 200, 66, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(88, 166, 255, 0.04) 0%, transparent 60%);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.6em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-link {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-card-hover);
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .category-tab {
+            font-family: 'Outfit', sans-serif;
+            background: transparent;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .category-tab.active {
+            color: var(--text-primary);
+            background: var(--bg-dark);
+        }
+
+        .category-tab.joker.active {
+            box-shadow: 0 0 12px var(--joker-glow);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .category-tab.consumable.active {
+            box-shadow: 0 0 12px var(--consumable-glow);
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .category-tab.voucher.active {
+            box-shadow: 0 0 12px var(--voucher-glow);
+            border: 1px solid var(--accent-gold);
+        }
+
+        .category-tab.boss-blind.active {
+            box-shadow: 0 0 12px rgba(248, 81, 73, 0.3);
+            border: 1px solid var(--accent-red);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px 16px 12px 44px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            background: var(--bg-input);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-pill {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .filter-pill:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+
+        .filter-pill.active {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+            color: white;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85em;
+        }
+
+        .stat-chip .label {
+            color: var(--text-secondary);
+        }
+
+        .stat-chip .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 24px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .items-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-size: 0.95em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .item-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .item-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .item-card.selected {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 20px rgba(163, 113, 247, 0.2);
+        }
+
+        .item-card.has-notes::after {
+            content: '📝';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.85em;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-card.joker .item-name {
+            color: var(--accent-purple);
+        }
+
+        .item-card.consumable .item-name {
+            color: var(--accent-cyan);
+        }
+
+        .item-card.voucher .item-name {
+            color: var(--accent-gold);
+        }
+
+        .item-card.boss_blind .item-name {
+            color: var(--accent-red);
+        }
+
+        .item-rarity {
+            font-size: 0.7em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .item-rarity.common {
+            background: rgba(139, 148, 158, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .item-rarity.uncommon {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--accent-green);
+        }
+
+        .item-rarity.rare {
+            background: rgba(88, 166, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .item-rarity.legendary {
+            background: rgba(163, 113, 247, 0.2);
+            color: var(--accent-purple);
+        }
+
+        .item-rarity.tarot {
+            background: rgba(219, 97, 162, 0.2);
+            color: var(--accent-pink);
+        }
+
+        .item-rarity.spectral {
+            background: rgba(88, 166, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .item-effect {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+
+        .item-cost {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--accent-gold);
+        }
+
+        .notes-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .notes-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .selected-item-header {
+            margin-bottom: 20px;
+        }
+
+        .selected-item-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .selected-item-name.joker {
+            color: var(--accent-purple);
+        }
+
+        .selected-item-name.consumable {
+            color: var(--accent-cyan);
+        }
+
+        .selected-item-name.voucher {
+            color: var(--accent-gold);
+        }
+
+        .selected-item-name.boss_blind {
+            color: var(--accent-red);
+        }
+
+        .selected-item-effect {
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 14px 16px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .notes-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .notes-label {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .notes-label::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: var(--accent-orange);
+            border-radius: 2px;
+        }
+
+        .version-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: var(--bg-dark);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .version-controls .label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .version-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .version-button {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .version-button:hover:not(:disabled) {
+            border-color: var(--accent-cyan);
+            background: var(--bg-card-hover);
+        }
+
+        .version-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .version-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            color: var(--text-primary);
+            padding: 6px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(88, 166, 255, 0.15);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .version-timestamp {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            margin-left: auto;
+        }
+
+        .notes-display {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 0.9em;
+            line-height: 1.7;
+            color: var(--text-primary);
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .notes-display.empty {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.1em;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+        }
+
+        .loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .no-results-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .notes-panel {
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .category-tabs {
+                justify-content: center;
+            }
+
+            .search-container {
+                max-width: none;
+            }
+
+            .stats-bar {
+                margin-left: 0;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 <span>Balatro Game Object Notes</span></h1>
+            <div class="nav-links">
+                <a href="/" class="nav-link">🎮 Game Monitor</a>
+                <a href="/history" class="nav-link">📊 Game History</a>
+            </div>
+        </header>
+
+        <div class="controls-bar">
+            <div class="category-tabs">
+                <button class="category-tab joker active" data-category="joker" onclick="switchCategory('joker')">
+                    🃏 Jokers
+                </button>
+                <button class="category-tab consumable" data-category="consumable" onclick="switchCategory('consumable')">
+                    ✨ Consumables
+                </button>
+                <button class="category-tab voucher" data-category="voucher" onclick="switchCategory('voucher')">
+                    🎫 Vouchers
+                </button>
+                <button class="category-tab boss-blind" data-category="boss_blind" onclick="switchCategory('boss_blind')">
+                    👹 Boss Blinds
+                </button>
+            </div>
+
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="search-input" placeholder="Search items..." oninput="filterItems()">
+            </div>
+
+            <div class="filter-pills" id="filter-pills">
+                <button class="filter-pill active" data-filter="all" onclick="setFilter('all')">All</button>
+                <button class="filter-pill" data-filter="with-notes" onclick="setFilter('with-notes')">With Notes</button>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-chip">
+                    <span class="label">Items</span>
+                    <span class="value" id="items-count">0</span>
+                </div>
+                <div class="stat-chip">
+                    <span class="label">With Notes</span>
+                    <span class="value" id="notes-count">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="items-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span id="panel-icon">🃏</span>
+                        <span id="panel-title-text">Jokers</span>
+                    </div>
+                    <span id="showing-count" style="color: var(--text-secondary); font-size: 0.85em;">-</span>
+                </div>
+                <div class="items-grid" id="items-grid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading items...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        📝 Notes
+                    </div>
+                </div>
+                <div class="notes-content" id="notes-content">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👈</div>
+                        <h3>Select an item</h3>
+                        <p>Click on any item to view its notes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentCategory = 'joker';
+        let currentFilter = 'all';
+        let selectedItem = null;
+        let items = {
+            joker: [],
+            consumable: [],
+            voucher: [],
+            boss_blind: []
+        };
+        let itemNotes = {};
+        let noteHistory = [];
+        let currentVersionIndex = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadAllData();
+            renderItems();
+        });
+
+        // Data loading
+        async function loadAllData() {
+            try {
+                const [jokers, consumables, vouchers, bossBlind, notes] = await Promise.all([
+                    fetch('/api/reference/jokers').then(r => r.json()),
+                    fetch('/api/reference/consumables').then(r => r.json()),
+                    fetch('/api/reference/vouchers').then(r => r.json()),
+                    fetch('/api/reference/boss-blinds').then(r => r.json()),
+                    fetch('/api/game-object-notes').then(r => r.json())
+                ]);
+
+                items.joker = jokers;
+                items.consumable = consumables;
+                items.voucher = vouchers;
+                items.boss_blind = bossBlind;
+
+                // Index notes by type and name
+                notes.forEach(note => {
+                    const key = `${note.type}:${note.name}`;
+                    itemNotes[key] = note.notes;
+                });
+
+                updateStats();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('items-grid').innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">⚠️</div>
+                        <h3>Error loading data</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function switchCategory(category) {
+            currentCategory = category;
+            selectedItem = null;
+            noteHistory = [];
+            currentVersionIndex = 0;
+
+            // Update tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.category === category) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Update panel title
+            const titles = {
+                joker: { icon: '🃏', text: 'Jokers' },
+                consumable: { icon: '✨', text: 'Consumables' },
+                voucher: { icon: '🎫', text: 'Vouchers' },
+                boss_blind: { icon: '👹', text: 'Boss Blinds' }
+            };
+            document.getElementById('panel-icon').textContent = titles[category].icon;
+            document.getElementById('panel-title-text').textContent = titles[category].text;
+
+            // Clear notes panel
+            document.getElementById('notes-content').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👈</div>
+                    <h3>Select an item</h3>
+                    <p>Click on any item to view its notes</p>
+                </div>
+            `;
+
+            renderItems();
+            updateStats();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+                if (pill.dataset.filter === filter) {
+                    pill.classList.add('active');
+                }
+            });
+
+            renderItems();
+        }
+
+        function filterItems() {
+            renderItems();
+        }
+
+        function getFilteredItems() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            let filtered = items[currentCategory] || [];
+
+            // Apply search filter
+            if (searchTerm) {
+                filtered = filtered.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    (item.effect && item.effect.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Apply notes filter
+            if (currentFilter === 'with-notes') {
+                filtered = filtered.filter(item => {
+                    const key = `${currentCategory}:${item.name}`;
+                    return itemNotes[key] && itemNotes[key].trim().length > 0;
+                });
+            }
+
+            return filtered;
+        }
+
+        function renderItems() {
+            const grid = document.getElementById('items-grid');
+            const filtered = getFilteredItems();
+
+            document.getElementById('showing-count').textContent = 
+                `Showing ${filtered.length} of ${items[currentCategory]?.length || 0}`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <h3>No items found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const key = `${currentCategory}:${item.name}`;
+                const hasNotes = itemNotes[key] && itemNotes[key].trim().length > 0;
+                const isSelected = selectedItem && selectedItem.name === item.name;
+
+                let rarityClass = '';
+                let rarityText = '';
+
+                if (currentCategory === 'joker') {
+                    rarityClass = (item.rarity || 'common').toLowerCase();
+                    rarityText = item.rarity || 'Common';
+                } else if (currentCategory === 'consumable') {
+                    rarityClass = item.category || 'tarot';
+                    rarityText = item.category === 'spectral' ? 'Spectral' : 'Tarot';
+                } else if (currentCategory === 'voucher') {
+                    rarityClass = item.tier === 1 ? 'common' : 'rare';
+                    rarityText = item.tier === 1 ? 'Tier 1' : 'Tier 2';
+                } else if (currentCategory === 'boss_blind') {
+                    rarityClass = 'legendary';
+                    rarityText = `${item.chip_multiplier}x Chips`;
+                }
+
+                return `
+                    <div class="item-card ${currentCategory} ${hasNotes ? 'has-notes' : ''} ${isSelected ? 'selected' : ''}"
+                         onclick="selectItem('${escapeHtml(item.name)}')"
+                         data-name="${escapeHtml(item.name)}">
+                        <div class="item-name">
+                            ${escapeHtml(item.name)}
+                            <span class="item-rarity ${rarityClass}">${rarityText}</span>
+                        </div>
+                        <div class="item-effect">${escapeHtml(item.effect || item.description?.join(' ') || '-')}</div>
+                        ${item.cost !== undefined ? `
+                            <div class="item-meta">
+                                <span class="item-cost">$${item.cost}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function selectItem(name) {
+            const item = items[currentCategory].find(i => i.name === name);
+            if (!item) return;
+
+            selectedItem = item;
+
+            // Update card selection styling
+            document.querySelectorAll('.item-card').forEach(card => {
+                card.classList.remove('selected');
+                if (card.dataset.name === name) {
+                    card.classList.add('selected');
+                }
+            });
+
+            // Load version history
+            try {
+                const response = await fetch(`/api/game-object-notes/${currentCategory}/${encodeURIComponent(name)}/history`);
+                const data = await response.json();
+                noteHistory = data.history || [];
+                currentVersionIndex = 0; // Start with latest version
+            } catch (error) {
+                console.error('Error loading version history:', error);
+                noteHistory = [];
+                currentVersionIndex = 0;
+            }
+
+            renderNotesPanel();
+        }
+
+        function renderNotesPanel() {
+            if (!selectedItem) return;
+
+            const item = selectedItem;
+            const hasHistory = noteHistory.length > 0;
+            const currentVersion = hasHistory ? noteHistory[currentVersionIndex] : null;
+            const notes = currentVersion ? currentVersion.notes : '';
+            const hasNotes = notes.trim().length > 0;
+
+            let versionControlsHtml = '';
+            if (hasHistory && noteHistory.length > 1) {
+                const isLatest = currentVersionIndex === 0;
+                const isOldest = currentVersionIndex === noteHistory.length - 1;
+                const versionNumber = currentVersion.version;
+                const totalVersions = noteHistory.length;
+                const timestamp = new Date(currentVersion.updated_at).toLocaleString();
+
+                versionControlsHtml = `
+                    <div class="version-controls">
+                        <span class="label">Version History:</span>
+                        <div class="version-nav">
+                            <button class="version-button" onclick="navigateVersion(-1)" ${isOldest ? 'disabled' : ''}>
+                                ← Older
+                            </button>
+                            <div class="version-info">
+                                ${versionNumber} / ${noteHistory[0].version}
+                                ${isLatest ? '<span class="version-badge">Latest</span>' : ''}
+                            </div>
+                            <button class="version-button" onclick="navigateVersion(1)" ${isLatest ? 'disabled' : ''}>
+                                Newer →
+                            </button>
+                        </div>
+                        <span class="version-timestamp">${timestamp}</span>
+                    </div>
+                `;
+            } else if (hasHistory && noteHistory.length === 1) {
+                const timestamp = new Date(currentVersion.updated_at).toLocaleString();
+                versionControlsHtml = `
+                    <div class="version-controls">
+                        <span class="label">Version:</span>
+                        <div class="version-info">
+                            ${currentVersion.version} <span class="version-badge">Latest</span>
+                        </div>
+                        <span class="version-timestamp">${timestamp}</span>
+                    </div>
+                `;
+            }
+
+            document.getElementById('notes-content').innerHTML = `
+                <div class="selected-item-header">
+                    <div class="selected-item-name ${currentCategory}">
+                        ${escapeHtml(item.name)}
+                    </div>
+                    <div class="selected-item-effect">
+                        ${escapeHtml(item.effect || item.description?.join(' ') || 'No description available')}
+                    </div>
+                </div>
+                <div class="notes-section">
+                    <div class="notes-label">Analysis Notes</div>
+                    ${versionControlsHtml}
+                    <div class="notes-display ${hasNotes ? '' : 'empty'}">
+                        ${hasNotes ? escapeHtml(notes) : 'No notes available for this item.'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function navigateVersion(direction) {
+            const newIndex = currentVersionIndex - direction; // -1 for older, +1 for newer
+            if (newIndex >= 0 && newIndex < noteHistory.length) {
+                currentVersionIndex = newIndex;
+                renderNotesPanel();
+            }
+        }
+
+        function updateStats() {
+            const currentItems = items[currentCategory] || [];
+            let notesCount = 0;
+
+            currentItems.forEach(item => {
+                const key = `${currentCategory}:${item.name}`;
+                if (itemNotes[key] && itemNotes[key].trim().length > 0) {
+                    notesCount++;
+                }
+            });
+
+            document.getElementById('items-count').textContent = currentItems.length;
+            document.getElementById('notes-count').textContent = notesCount;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Escape to clear search
+            if (e.key === 'Escape') {
+                const searchInput = document.getElementById('search-input');
+                if (document.activeElement === searchInput) {
+                    searchInput.value = '';
+                    filterItems();
+                    searchInput.blur();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -43,7 +43,7 @@ for (const run of runMetadata) {
 
       /* Turn navigation buttons */
       .turn-controls button:not(:disabled):hover {
-        background-color: var(--color-border-light) !important;
+        background-color: var(--color-accent-hover) !important;
       }
 
       /* Turn browser layout - grid ensures text panel matches screenshot height */
@@ -676,9 +676,9 @@ for (const run of runMetadata) {
               </tr>
             </tbody>
           </table>
-        	<p class="mb-4" style="color: var(--color-text-secondary);">
-			Select a run from the table above to view the turn-by-turn history and agent reasoning of that run.
-		  </p>
+          <p class="mb-4 text-center italic text-sm" style="color: var(--color-text-secondary); opacity: 0.85;">
+            Select a run from the table above to view the turn-by-turn history and agent reasoning of that run.
+          </p>
           <div id="turn-browser" class="max-w-full">
             <div class="turn-browser-layout">
               <div class="bg-white p-4 rounded">
@@ -689,7 +689,7 @@ for (const run of runMetadata) {
                   <button
                     id="prev-turn-btn"
                     class="px-4 py-2 rounded font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style="background-color: var(--color-bg-secondary); border: 1px solid var(--color-border-light);"
+                    style="background-color: var(--color-accent); color: white; border: none;"
                     disabled
                   >
                     ← Previous
@@ -704,7 +704,7 @@ for (const run of runMetadata) {
                   <button
                     id="next-turn-btn"
                     class="px-4 py-2 rounded font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    style="background-color: var(--color-bg-secondary); border: 1px solid var(--color-border-light);"
+                    style="background-color: var(--color-accent); color: white; border: none;"
                     disabled
                   >
                     Next →
@@ -771,6 +771,24 @@ for (const run of runMetadata) {
         can create outsize impact for 10x cheaper.
       </p>
     </main>
+
+    <footer
+      class="max-w-[760px] mx-auto py-8 px-8 border-t text-center text-sm"
+      style="border-color: var(--color-border-light); color: var(--color-text-secondary);"
+    >
+      <p>
+        © {new Date().getFullYear()}
+        <a
+          href="https://www.linkedin.com/in/zhjzhang/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)]"
+          style="color: var(--color-accent);"
+        >
+          Jordan Zhang
+        </a>
+      </p>
+    </footer>
 
     <script is:inline define:vars={{ runMetadata }}>
       // State for current selection
