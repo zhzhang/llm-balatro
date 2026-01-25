@@ -111,10 +111,6 @@ for (const run of runMetadata) {
           overflow-x: auto;
         }
 
-        .turn-display {
-          grid-template-columns: 1fr !important;
-        }
-
         .turn-details {
           height: auto !important;
           max-height: 500px !important;
@@ -293,7 +289,10 @@ for (const run of runMetadata) {
           setting for each model. I also include the average cost per turn for
           each model.
         </p>
-
+        <p class="mb-4" style="color: var(--color-text-secondary);">
+          Click any cell in the table below to view the turn-by-turn history of
+          that run.
+        </p>
         <div
           class="table-container my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2"
         >
@@ -578,65 +577,25 @@ for (const run of runMetadata) {
               </tr>
             </tbody>
           </table>
-        <p
-          class="mb-4"
-          style="color: var(--color-text-secondary);"
-        >
-          Click any cell in the table above to view the turn-by-turn history of
-          that run.
-        </p>
 
-
-          <div
-            id="turn-browser"
-            class="turn-display grid grid-cols-[60%_40%] max-h-100"
-            style="display: none;"
-          >
+          <div id="turn-browser" class="flex max-w-full">
             <div class="bg-white p-4 rounded">
-              <div
-                class="turn-controls grid grid-cols-[1fr_auto_1fr] gap-4 items-center mb-4"
-              >
-                <button
-                  id="prev-turn"
-                  disabled
-                  class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-start hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600"
-                  >← Previous Turn</button
-                >
-                <span
-                  id="turn-counter"
-                  class="font-semibold text-lg text-center whitespace-nowrap"
-                  >Turn 0 / 0</span
-                >
-                <button
-                  id="next-turn"
-                  disabled
-                  class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-end hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600"
-                  >Next Turn →</button
-                >
-              </div>
               <img
                 id="screenshot-img"
                 alt="Game state screenshot"
                 class="w-full h-auto border rounded block"
                 style="border-color: var(--color-border-light);"
+                src="/turn-history/gemini/84N5GIYF/0.png"
               />
             </div>
-
-            <div class="turn-details bg-white p-4 rounded overflow-y-auto">
-              <div class="mb-6 last:mb-0">
-                <h3 class="mt-0 mb-2">Action</h3>
-                <pre
-                  id="action-text"
-                  class="bg-gray-100 p-3 rounded overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 m-0">
-                </pre>
-              </div>
-
-              <div class="mb-6 last:mb-0">
-                <h3 class="mt-0 mb-2">Reasoning</h3>
-                <pre
-                  id="reasoning-text"
-                  class="bg-gray-100 p-3 rounded overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 m-0">
-                </pre>
+            <div class="p-4 max-w-xl">
+              <h3 class="text-lg font-semibold mb-3">Agent Reasoning</h3>
+              <div
+                id="reasoning-text"
+                class="text-sm leading-relaxed whitespace-pre-wrap"
+                style="color: var(--color-text-secondary);"
+              >
+                Loading...
               </div>
             </div>
           </div>
@@ -649,246 +608,37 @@ for (const run of runMetadata) {
             Loading turn history...
           </div>
         </div>
-        </div>
-        <p>
-          Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
-          despite the latter being bigger and more expensive.
-        </p>
-
-        <p>
-          The reason for this gap, Google's secret weapon in the current AI
-          race: Youtube. When I originally started the agent development with
-          Claude, performance was poor, and I looked for a textual guide to see
-          if I could hand the manual strategy for success. (I also tried briefly
-          implementing Reflexion, as well as an AlphaEvolve-based evolutionary
-          algorithm) Good, comprehensive text-based guides were very hard to
-          find, but Youtube had tons of content from streamers, breaking down
-          strategies and gameplay. When watching gemini play, I noticed within
-          the first couple of Antes that it knew more about the game than the
-          other two models, certainly more than was possible from the state
-          context I was giving it.
-        </p>
-
-        <p>
-          At the end of the day, the Bitter Lesson is that this AI race is about
-          scaling compute and data, and teams that have access to more and
-          better of both will win. This experiment has woken me up to how unfair
-          of an advantage Youtube is in the AI race. The sheer amount of high
-          fidelity multi-modal explanations of pretty much any topic you can
-          imagine creates a data moat that companies starting from scraping the
-          internet struggle to match. If you have the right data for a specific
-          domain, you can create outsize impact for 10x cheaper.
-        </p>
       </article>
+      <p>
+        Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
+        despite the latter being bigger and more expensive.
+      </p>
+
+      <p>
+        The reason for this gap, Google's secret weapon in the current AI race:
+        Youtube. When I originally started the agent development with Claude,
+        performance was poor, and I looked for a textual guide to see if I could
+        hand the manual strategy for success. (I also tried briefly implementing
+        Reflexion, as well as an AlphaEvolve-based evolutionary algorithm) Good,
+        comprehensive text-based guides were very hard to find, but Youtube had
+        tons of content from streamers, breaking down strategies and gameplay.
+        When watching gemini play, I noticed within the first couple of Antes
+        that it knew more about the game than the other two models, certainly
+        more than was possible from the state context I was giving it.
+      </p>
+
+      <p>
+        At the end of the day, the Bitter Lesson is that this AI race is about
+        scaling compute and data, and teams that have access to more and better
+        of both will win. This experiment has woken me up to how unfair of an
+        advantage Youtube is in the AI race. The sheer amount of high fidelity
+        multi-modal explanations of pretty much any topic you can imagine
+        creates a data moat that companies starting from scraping the internet
+        struggle to match. If you have the right data for a specific domain, you
+        can create outsize impact for 10x cheaper.
+      </p>
     </main>
 
-    <script is:inline define:vars={{ runMetadata }}>
-      // Wait for DOM to be ready
-      document.addEventListener("DOMContentLoaded", () => {
-
-        // Create a map for quick lookup: agent -> seed -> metadata
-        const metadataMap = new Map();
-        for (const run of runMetadata) {
-          if (!metadataMap.has(run.agent)) {
-            metadataMap.set(run.agent, new Map());
-          }
-          metadataMap.get(run.agent).set(run.seed, run);
-        }
-
-        let currentAgent = "";
-        let currentSeed = "";
-        let currentMetadata = null;
-        let currentTurnIndex = 0;
-        let selectedCell = null;
-
-        const turnBrowser = document.getElementById("turn-browser");
-        const loadingMessage = document.getElementById("loading-message");
-        const prevButton = document.getElementById("prev-turn");
-        const nextButton = document.getElementById("next-turn");
-        const turnCounter = document.getElementById("turn-counter");
-		const turnViewer = document.getElementById("turn-viewer");
-        const screenshotImg = document.getElementById("screenshot-img");
-        const screenshotContainer = document.querySelector(".turn-screenshot");
-        const turnDetails = document.querySelector(".turn-details");
-        const actionText = document.getElementById("action-text");
-        const reasoningText = document.getElementById("reasoning-text");
-
-        // Function to match turn-details height to screenshot container
-        function matchDetailsHeight() {
-          if (screenshotContainer && turnDetails) {
-            const height = screenshotContainer.offsetHeight;
-            turnDetails.style.height = height + "px";
-          }
-        }
-
-        async function loadTurnHistory(agent, seed, clickedCell) {
-          if (!agent || !seed) {
-            turnBrowser.style.display = "none";
-            return;
-          }
-
-          // Update selected cell styling
-          if (selectedCell) {
-            selectedCell.classList.remove("selected");
-          }
-          selectedCell = clickedCell;
-          if (selectedCell) {
-            selectedCell.classList.add("selected");
-          }
-
-          // Show loading
-          turnBrowser.style.display = "none";
-          loadingMessage.style.display = "block";
-
-          try {
-            // Get metadata from the pre-loaded map
-            if (!metadataMap.has(agent) || !metadataMap.get(agent).has(seed)) {
-              throw new Error(
-                "No metadata found for this agent/seed combination",
-              );
-            }
-
-            currentMetadata = metadataMap.get(agent).get(seed);
-            currentAgent = agent;
-            currentSeed = seed;
-            currentTurnIndex = 0;
-
-            if (!currentMetadata.turns || currentMetadata.turns.length === 0) {
-              alert("No turn history found for this game");
-              loadingMessage.style.display = "none";
-              return;
-            }
-
-            // Show browser and display first turn
-            loadingMessage.style.display = "none";
-            turnBrowser.style.display = "block";
-            await displayTurn();
-
-            // Scroll to turn history section
-            turnBrowser.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            });
-          } catch (error) {
-            console.error("Error loading turn history:", error);
-            alert("Failed to load turn history. Check console for details.");
-            loadingMessage.style.display = "none";
-          }
-        }
-
-        async function displayTurn() {
-          if (!currentMetadata || !currentMetadata.turns.length) return;
-
-          const turnNumber = currentMetadata.turns[currentTurnIndex];
-
-          try {
-            // Load turn data
-            const turnResponse = await fetch(
-              `/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.json`,
-            );
-            if (!turnResponse.ok) {
-              throw new Error("Failed to fetch turn data");
-            }
-            const turnData = await turnResponse.json();
-
-            // Update turn counter
-            turnCounter.textContent = `Turn ${turnData.turn}${turnData.ante ? ` (Ante ${turnData.ante})` : ""} — ${currentTurnIndex + 1} / ${currentMetadata.turns.length}`;
-
-            // Update screenshot
-            if (turnData.hasScreenshot) {
-              screenshotImg.src = `/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.png`;
-              screenshotImg.style.display = "block";
-
-              // Match heights when image loads
-              screenshotImg.onload = () => {
-                matchDetailsHeight();
-              };
-            } else {
-              screenshotImg.style.display = "none";
-            }
-
-            // Update action text
-            actionText.textContent =
-              turnData.action || "No action data available";
-
-            // Update reasoning text
-            reasoningText.textContent =
-              turnData.reasoning || "No reasoning data available";
-
-            // Match heights in case image is cached
-            setTimeout(matchDetailsHeight, 100);
-
-            // Update button states
-            const isPrevDisabled = currentTurnIndex === 0;
-            const isNextDisabled =
-              currentTurnIndex === currentMetadata.turns.length - 1;
-
-            prevButton.disabled = isPrevDisabled;
-            nextButton.disabled = isNextDisabled;
-          } catch (error) {
-            console.error("Error displaying turn:", error);
-            alert("Failed to load turn data");
-          }
-        }
-
-        async function goToPreviousTurn() {
-          if (currentTurnIndex > 0) {
-            currentTurnIndex--;
-            await displayTurn();
-          }
-        }
-
-        async function goToNextTurn() {
-          if (
-            currentMetadata &&
-            currentTurnIndex < currentMetadata.turns.length - 1
-          ) {
-            currentTurnIndex++;
-            await displayTurn();
-          }
-        }
-
-        // Event listeners for table cells
-        const clickableCells = document.querySelectorAll(
-          ".outcomes-table td.clickable",
-        );
-        clickableCells.forEach((cell) => {
-          cell.addEventListener("click", () => {
-            const agent = cell.getAttribute("data-agent");
-            const seed = cell.getAttribute("data-seed");
-            loadTurnHistory(agent, seed, cell);
-          });
-        });
-
-        prevButton.addEventListener("click", goToPreviousTurn);
-        nextButton.addEventListener("click", goToNextTurn);
-
-        // Keyboard navigation
-        document.addEventListener("keydown", (e) => {
-          if (turnBrowser.style.display === "none") return;
-
-          if (e.key === "ArrowLeft") {
-            goToPreviousTurn();
-          } else if (e.key === "ArrowRight") {
-            goToNextTurn();
-          }
-        });
-
-        // Window resize handler
-        window.addEventListener("resize", () => {
-          if (turnBrowser.style.display !== "none") {
-            matchDetailsHeight();
-          }
-        });
-
-        // Auto-select first cell on page load
-        if (clickableCells.length > 0) {
-          const firstCell = clickableCells[0];
-          const agent = firstCell.getAttribute("data-agent");
-          const seed = firstCell.getAttribute("data-seed");
-          loadTurnHistory(agent, seed, firstCell);
-        }
-      });
-    </script>
+    <script is:inline define:vars={{ runMetadata }}></script>
   </body>
 </html>
