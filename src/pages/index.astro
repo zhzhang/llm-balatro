@@ -15,10 +15,6 @@ const runMetadata = JSON.parse(indexContent) as Array<{
   turns: number[];
 }>;
 
-// Get unique agents and seeds
-const agents = [...new Set(runMetadata.map((r) => r.agent))].sort();
-const seeds = [...new Set(runMetadata.map((r) => r.seed))].sort();
-
 // Create a map for quick lookup: agent -> seed -> outcome
 const outcomeMap = new Map<string, Map<string, string>>();
 for (const run of runMetadata) {
@@ -113,11 +109,6 @@ for (const run of runMetadata) {
         .table-container {
           width: calc(100vw - 3rem) !important;
           overflow-x: auto;
-        }
-
-        #turn-history-section {
-          padding: 1rem !important;
-          width: calc(100vw - 3rem) !important;
         }
 
         .turn-display {
@@ -587,9 +578,7 @@ for (const run of runMetadata) {
               </tr>
             </tbody>
           </table>
-        </div>
         <p
-          id="turn-history-instructions"
           class="mb-4"
           style="color: var(--color-text-secondary);"
         >
@@ -597,11 +586,7 @@ for (const run of runMetadata) {
           that run.
         </p>
 
-        <div
-          class="my-8 p-6 rounded-lg w-[calc(100vw-4rem)] max-w-screen"
-          style="background-color: var(--color-bg-secondary);"
-          id="turn-history-section"
-        >
+
           <div
             id="turn-browser"
             class="turn-display grid grid-cols-[60%_40%] max-h-100"
@@ -664,6 +649,7 @@ for (const run of runMetadata) {
             Loading turn history...
           </div>
         </div>
+        </div>
         <p>
           Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
           despite the latter being bigger and more expensive.
@@ -699,7 +685,6 @@ for (const run of runMetadata) {
     <script is:inline define:vars={{ runMetadata }}>
       // Wait for DOM to be ready
       document.addEventListener("DOMContentLoaded", () => {
-        console.log("DOM loaded, runMetadata entries:", runMetadata.length);
 
         // Create a map for quick lookup: agent -> seed -> metadata
         const metadataMap = new Map();
@@ -710,28 +695,18 @@ for (const run of runMetadata) {
           metadataMap.get(run.agent).set(run.seed, run);
         }
 
-        console.log(
-          "Metadata map created, agents:",
-          Array.from(metadataMap.keys()),
-        );
-
         let currentAgent = "";
         let currentSeed = "";
         let currentMetadata = null;
         let currentTurnIndex = 0;
         let selectedCell = null;
 
-        const turnHistorySection = document.getElementById(
-          "turn-history-section",
-        );
-        const turnHistoryInstructions = document.getElementById(
-          "turn-history-instructions",
-        );
         const turnBrowser = document.getElementById("turn-browser");
         const loadingMessage = document.getElementById("loading-message");
         const prevButton = document.getElementById("prev-turn");
         const nextButton = document.getElementById("next-turn");
         const turnCounter = document.getElementById("turn-counter");
+		const turnViewer = document.getElementById("turn-viewer");
         const screenshotImg = document.getElementById("screenshot-img");
         const screenshotContainer = document.querySelector(".turn-screenshot");
         const turnDetails = document.querySelector(".turn-details");
@@ -764,7 +739,6 @@ for (const run of runMetadata) {
           // Show loading
           turnBrowser.style.display = "none";
           loadingMessage.style.display = "block";
-          turnHistoryInstructions.style.display = "none";
 
           try {
             // Get metadata from the pre-loaded map
@@ -791,7 +765,7 @@ for (const run of runMetadata) {
             await displayTurn();
 
             // Scroll to turn history section
-            turnHistorySection.scrollIntoView({
+            turnBrowser.scrollIntoView({
               behavior: "smooth",
               block: "nearest",
             });
@@ -848,12 +822,7 @@ for (const run of runMetadata) {
             const isPrevDisabled = currentTurnIndex === 0;
             const isNextDisabled =
               currentTurnIndex === currentMetadata.turns.length - 1;
-            console.log("Turn navigation:", {
-              currentTurnIndex,
-              totalTurns: currentMetadata.turns.length,
-              isPrevDisabled,
-              isNextDisabled,
-            });
+
             prevButton.disabled = isPrevDisabled;
             nextButton.disabled = isNextDisabled;
           } catch (error) {
@@ -887,7 +856,6 @@ for (const run of runMetadata) {
           cell.addEventListener("click", () => {
             const agent = cell.getAttribute("data-agent");
             const seed = cell.getAttribute("data-seed");
-            console.log("Cell clicked:", { agent, seed });
             loadTurnHistory(agent, seed, cell);
           });
         });
@@ -918,7 +886,6 @@ for (const run of runMetadata) {
           const firstCell = clickableCells[0];
           const agent = firstCell.getAttribute("data-agent");
           const seed = firstCell.getAttribute("data-seed");
-          console.log("Auto-loading first cell:", { agent, seed });
           loadTurnHistory(agent, seed, firstCell);
         }
       });
