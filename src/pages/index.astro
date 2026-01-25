@@ -142,9 +142,24 @@ for (const run of runMetadata) {
 			color: rgb(239, 68, 68);
 		}
 
+		.outcomes-table td.clickable {
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.outcomes-table td.clickable:hover {
+			transform: scale(1.05);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+		}
+
+		.outcomes-table td.selected {
+			outline: 3px solid #2563eb;
+			outline-offset: -3px;
+		}
+
 		.turn-history-section {
-			margin: 4rem 0;
-			padding: 2rem;
+			margin: 2rem 0;
+			padding: 1.5rem;
 			background-color: var(--bg-secondary);
 			border-radius: 8px;
 			width: calc(100vw - 4rem);
@@ -156,89 +171,80 @@ for (const run of runMetadata) {
 
 		.turn-history-section h2 {
 			margin-top: 0;
+			margin-bottom: 1rem;
 		}
 
-		.selector-controls {
-			display: flex;
-			gap: 2rem;
-			margin: 2rem 0;
-			flex-wrap: wrap;
-		}
-
-		.control-group {
-			display: flex;
-			flex-direction: column;
-			gap: 0.5rem;
-		}
-
-		.control-group label {
-			font-weight: 600;
-			font-size: 0.9rem;
-		}
-
-		.control-group select {
-			padding: 0.5rem;
-			border: 1px solid var(--border-light);
-			border-radius: 4px;
-			background-color: white;
-			font-size: 1rem;
-			min-width: 200px;
-		}
 
 		.turn-browser {
-			margin-top: 2rem;
+			margin-top: 1rem;
 		}
 
 		.turn-controls {
-			display: flex;
-			justify-content: space-between;
+			display: grid;
+			grid-template-columns: 1fr auto 1fr;
+			gap: 1rem;
 			align-items: center;
-			margin-bottom: 2rem;
-			padding: 1rem;
+			margin-bottom: 1rem;
+			padding: 0.75rem;
 			background-color: white;
 			border-radius: 4px;
+		}
+		
+		.turn-controls button:first-child {
+			justify-self: start;
+		}
+		
+		.turn-controls button:last-child {
+			justify-self: end;
 		}
 
 		.turn-controls button {
 			padding: 0.75rem 1.5rem;
-			background-color: var(--text-link);
+			background-color: #2563eb;
 			color: white;
-			border: none;
+			border: 2px solid transparent;
 			border-radius: 4px;
 			cursor: pointer;
 			font-size: 1rem;
-			transition: opacity 0.2s ease;
+			transition: all 0.2s ease;
+			flex-shrink: 0;
+			min-width: 150px;
+			font-weight: 500;
 		}
 
 		.turn-controls button:hover:not(:disabled) {
-			opacity: 0.9;
+			background-color: #1d4ed8;
 		}
 
 		.turn-controls button:disabled {
-			background-color: #ccc;
+			background-color: #6b7280;
+			color: #d1d5db;
 			cursor: not-allowed;
+			border-color: #4b5563;
 		}
 
 		#turn-counter {
 			font-weight: 600;
 			font-size: 1.1rem;
+			text-align: center;
+			white-space: nowrap;
 		}
 
 		.turn-display {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
-			gap: 2rem;
+			gap: 1rem;
 		}
 
 		.turn-screenshot {
 			background-color: white;
-			padding: 1.5rem;
+			padding: 1rem;
 			border-radius: 4px;
 		}
 
 		.turn-screenshot h3 {
 			margin-top: 0;
-			margin-bottom: 1rem;
+			margin-bottom: 0.5rem;
 		}
 
 		.turn-screenshot img {
@@ -251,23 +257,23 @@ for (const run of runMetadata) {
 		.turn-details {
 			display: flex;
 			flex-direction: column;
-			gap: 1.5rem;
+			gap: 1rem;
 		}
 
 		.detail-section {
 			background-color: white;
-			padding: 1.5rem;
+			padding: 1rem;
 			border-radius: 4px;
 		}
 
 		.detail-section h3 {
 			margin-top: 0;
-			margin-bottom: 1rem;
+			margin-bottom: 0.5rem;
 		}
 
 		.code-block {
 			background-color: #f5f5f5;
-			padding: 1rem;
+			padding: 0.75rem;
 			border-radius: 4px;
 			overflow-x: auto;
 			white-space: pre-wrap;
@@ -382,17 +388,8 @@ for (const run of runMetadata) {
 			}
 
 			.turn-history-section {
-				padding: 1.5rem;
+				padding: 1rem;
 				width: calc(100vw - 3rem);
-			}
-
-			.selector-controls {
-				flex-direction: column;
-				gap: 1rem;
-			}
-
-			.control-group select {
-				min-width: 100%;
 			}
 
 			.turn-display {
@@ -400,8 +397,17 @@ for (const run of runMetadata) {
 			}
 
 			.turn-controls {
-				flex-direction: column;
-				gap: 1rem;
+				grid-template-columns: 1fr;
+				grid-template-rows: auto auto auto;
+				gap: 0.75rem;
+			}
+			
+			.turn-controls button:first-child {
+				justify-self: stretch;
+			}
+			
+			.turn-controls button:last-child {
+				justify-self: stretch;
 			}
 
 			.turn-controls button {
@@ -466,7 +472,7 @@ for (const run of runMetadata) {
 				<ul>
 					<li>The game is stochastic with an enormous branching factor, requiring probabilistic reasoning to make optimal decisions.</li>
 					<li>Long sequences of planning and execution are needed to keep up with the exponentially increasing chip requirement.</li>
-					<li>The game is simple enough that its state can compactly be stringified, and the best move at any given time is usually path agnostic.</li>
+					<li>The game .</li>
 				</ul>
 				<p>
 					Good Balatro play requires picking the best move at any state, while how that move may change the trajectory of the game dozens of turns down the line.
@@ -506,78 +512,52 @@ for (const run of runMetadata) {
 							<tr>
 								<th>claude-4.5-sonnet</th>
 								<td>$0.058</td>
-								<td class="lost">Ante 6</td>
-								<td class="lost">Ante 6</td>
-								<td class="lost">Ante 5</td>
-								<td class="lost">Ante 6</td>
-								<td class="lost">Ante 4</td>
-								<td class="lost">Ante 5</td>
-								<td class="lost">Ante 2</td>
-								<td class="lost">Ante 5</td>
-								<td class="lost">Ante 3</td>
-								<td class="lost">Ante 4</td>
+								<td class="lost clickable" data-agent="claude" data-seed="22V4E3UE">Ante 6</td>
+								<td class="lost clickable" data-agent="claude" data-seed="2JW2IH4X">Ante 6</td>
+								<td class="lost clickable" data-agent="claude" data-seed="422J6NUH">Ante 5</td>
+								<td class="lost clickable" data-agent="claude" data-seed="5U4K91D8">Ante 6</td>
+								<td class="lost clickable" data-agent="claude" data-seed="84N5GIYF">Ante 4</td>
+								<td class="lost clickable" data-agent="claude" data-seed="H1Z58VZ6">Ante 5</td>
+								<td class="lost clickable" data-agent="claude" data-seed="M3F6LPGY">Ante 2</td>
+								<td class="lost clickable" data-agent="claude" data-seed="M8KADSBQ">Ante 5</td>
+								<td class="lost clickable" data-agent="claude" data-seed="PE93PR87">Ante 3</td>
+								<td class="lost clickable" data-agent="claude" data-seed="U15QWQGE">Ante 4</td>
 							</tr>
 							<tr>
 								<th>gpt-5.2</th>
 								<td>$0.034</td>
-								<td class="lost">Ante 5</td>
-								<td class="lost">Ante 5</td>
-								<td class="lost">Ante 7</td>
-								<td class="lost">Ante 7</td>
-								<td class="won">WON</td>
-								<td class="lost">Ante 6</td>
-								<td class="lost">Ante 4</td>
-								<td class="lost">Ante 5</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
+								<td class="lost clickable" data-agent="openai" data-seed="22V4E3UE">Ante 5</td>
+								<td class="lost clickable" data-agent="openai" data-seed="2JW2IH4X">Ante 5</td>
+								<td class="lost clickable" data-agent="openai" data-seed="422J6NUH">Ante 7</td>
+								<td class="lost clickable" data-agent="openai" data-seed="5U4K91D8">Ante 7</td>
+								<td class="won clickable" data-agent="openai" data-seed="84N5GIYF">WON</td>
+								<td class="lost clickable" data-agent="openai" data-seed="H1Z58VZ6">Ante 6</td>
+								<td class="lost clickable" data-agent="openai" data-seed="M3F6LPGY">Ante 4</td>
+								<td class="lost clickable" data-agent="openai" data-seed="M8KADSBQ">Ante 5</td>
+								<td class="won clickable" data-agent="openai" data-seed="PE93PR87">WON</td>
+								<td class="won clickable" data-agent="openai" data-seed="U15QWQGE">WON</td>
 							</tr>
 							<tr>
 								<th>gemini-3-flash</th>
 								<td>$0.008</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="lost">Ante 4</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
-								<td class="won">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="22V4E3UE">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="2JW2IH4X">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="422J6NUH">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="5U4K91D8">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="84N5GIYF">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="H1Z58VZ6">WON</td>
+								<td class="lost clickable" data-agent="gemini" data-seed="M3F6LPGY">Ante 4</td>
+								<td class="won clickable" data-agent="gemini" data-seed="M8KADSBQ">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="PE93PR87">WON</td>
+								<td class="won clickable" data-agent="gemini" data-seed="U15QWQGE">WON</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 
-				<p>
-					Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2, despite the latter being bigger and more expensive.
-				</p>
-
-				<div class="turn-history-section">
-					<h2>Explore Agent Turn History</h2>
-					<p>Select an agent and seed to browse through the turn-by-turn gameplay.</p>
-					
-					<div class="selector-controls">
-						<div class="control-group">
-							<label for="agent-select">Agent:</label>
-							<select id="agent-select">
-								<option value="">-- Select Agent --</option>
-								{agents.map(agent => (
-									<option value={agent} selected={agent === 'gemini'}>{agent}</option>
-								))}
-							</select>
-						</div>
-						
-						<div class="control-group">
-							<label for="seed-select">Seed:</label>
-							<select id="seed-select">
-								<option value="">-- Select Seed --</option>
-								{seeds.map(seed => (
-									<option value={seed} selected={seed === '22V4E3UE'}>{seed}</option>
-								))}
-							</select>
-						</div>
-					</div>
+				<div class="turn-history-section" id="turn-history-section">
+					<h2 id="turn-history-title">Turn History</h2>
+					<p id="turn-history-instructions" style="color: var(--text-secondary); margin-bottom: 1rem;">Click any cell in the table above to view the turn-by-turn history of that run.</p>
 
 					<div id="turn-browser" class="turn-browser" style="display: none;">
 						<div class="turn-controls">
@@ -588,23 +568,15 @@ for (const run of runMetadata) {
 
 						<div class="turn-display">
 							<div class="turn-screenshot">
-								<h3>Game State Screenshot</h3>
 								<img id="screenshot-img" alt="Game state screenshot" />
 							</div>
 
 							<div class="turn-details">
 								<div class="detail-section">
-									<h3>State Text</h3>
-									<pre id="state-text" class="code-block"></pre>
-								</div>
-
-								<div class="detail-section">
-									<h3>Agent Action</h3>
 									<pre id="action-text" class="code-block"></pre>
 								</div>
 
 								<div class="detail-section">
-									<h3>Agent Reasoning</h3>
 									<pre id="reasoning-text" class="code-block"></pre>
 								</div>
 							</div>
@@ -615,6 +587,10 @@ for (const run of runMetadata) {
 						Loading turn history...
 					</div>
 				</div>
+				<p>
+					Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2, despite the latter being bigger and more expensive.
+				</p>
+
 
 				<p>
 					The reason for this gap, Google's secret weapon in the current AI race: Youtube.
@@ -641,47 +617,67 @@ for (const run of runMetadata) {
 			</article>
 		</main>
 
-		<script>
+		<script is:inline define:vars={{ runMetadata }}>
 			// Wait for DOM to be ready
 			document.addEventListener('DOMContentLoaded', () => {
+				console.log('DOM loaded, runMetadata entries:', runMetadata.length);
+				
+				// Create a map for quick lookup: agent -> seed -> metadata
+				const metadataMap = new Map();
+				for (const run of runMetadata) {
+					if (!metadataMap.has(run.agent)) {
+						metadataMap.set(run.agent, new Map());
+					}
+					metadataMap.get(run.agent).set(run.seed, run);
+				}
+				
+				console.log('Metadata map created, agents:', Array.from(metadataMap.keys()));
+
 				let currentAgent = '';
 				let currentSeed = '';
 				let currentMetadata = null;
 				let currentTurnIndex = 0;
+				let selectedCell = null;
 
-				const agentSelect = document.getElementById('agent-select');
-				const seedSelect = document.getElementById('seed-select');
+				const turnHistorySection = document.getElementById('turn-history-section');
+				const turnHistoryTitle = document.getElementById('turn-history-title');
+				const turnHistoryInstructions = document.getElementById('turn-history-instructions');
 				const turnBrowser = document.getElementById('turn-browser');
 				const loadingMessage = document.getElementById('loading-message');
 				const prevButton = document.getElementById('prev-turn');
 				const nextButton = document.getElementById('next-turn');
 				const turnCounter = document.getElementById('turn-counter');
 				const screenshotImg = document.getElementById('screenshot-img');
-				const stateText = document.getElementById('state-text');
 				const actionText = document.getElementById('action-text');
 				const reasoningText = document.getElementById('reasoning-text');
 
-				async function loadTurnHistory() {
-					const agent = agentSelect.value;
-					const seed = seedSelect.value;
-
+				async function loadTurnHistory(agent, seed, clickedCell) {
 					if (!agent || !seed) {
 						turnBrowser.style.display = 'none';
 						return;
 					}
 
+					// Update selected cell styling
+					if (selectedCell) {
+						selectedCell.classList.remove('selected');
+					}
+					selectedCell = clickedCell;
+					if (selectedCell) {
+						selectedCell.classList.add('selected');
+					}
+
 					// Show loading
 					turnBrowser.style.display = 'none';
 					loadingMessage.style.display = 'block';
+					turnHistoryInstructions.style.display = 'none';
 
 					try {
-						// Load metadata for this agent/seed combination
-						const metadataResponse = await fetch(`/turn-history/${agent}/${seed}/metadata.json`);
-						if (!metadataResponse.ok) {
-							throw new Error('Failed to fetch metadata');
+						// Get metadata from the pre-loaded map
+						if (!metadataMap.has(agent) || !metadataMap.get(agent).has(seed)) {
+							throw new Error('No metadata found for this agent/seed combination');
 						}
 
-						currentMetadata = await metadataResponse.json();
+						currentMetadata = metadataMap.get(agent).get(seed);
 						currentAgent = agent;
 						currentSeed = seed;
 						currentTurnIndex = 0;
@@ -692,10 +688,16 @@ for (const run of runMetadata) {
 							return;
 						}
 
+						// Update title to show what's being displayed
+						turnHistoryTitle.textContent = `Turn History: ${agent} on seed ${seed}`;
+
 						// Show browser and display first turn
 						loadingMessage.style.display = 'none';
 						turnBrowser.style.display = 'block';
 						await displayTurn();
+
+						// Scroll to turn history section
+						turnHistorySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 					} catch (error) {
 						console.error('Error loading turn history:', error);
 						alert('Failed to load turn history. Check console for details.');
@@ -727,18 +729,6 @@ for (const run of runMetadata) {
 							screenshotImg.style.display = 'none';
 						}
 
-						// Update state text (prettify if it's JSON)
-						if (turnData.state) {
-							try {
-								const stateObj = JSON.parse(turnData.state);
-								stateText.textContent = JSON.stringify(stateObj, null, 2);
-							} catch {
-								stateText.textContent = turnData.state;
-							}
-						} else {
-							stateText.textContent = 'No state data available';
-						}
-
 						// Update action text
 						actionText.textContent = turnData.action || 'No action data available';
 
@@ -746,8 +736,16 @@ for (const run of runMetadata) {
 						reasoningText.textContent = turnData.reasoning || 'No reasoning data available';
 
 						// Update button states
-						prevButton.disabled = currentTurnIndex === 0;
-						nextButton.disabled = currentTurnIndex === currentMetadata.turns.length - 1;
+						const isPrevDisabled = currentTurnIndex === 0;
+						const isNextDisabled = currentTurnIndex === currentMetadata.turns.length - 1;
+						console.log('Turn navigation:', {
+							currentTurnIndex,
+							totalTurns: currentMetadata.turns.length,
+							isPrevDisabled,
+							isNextDisabled
+						});
+						prevButton.disabled = isPrevDisabled;
+						nextButton.disabled = isNextDisabled;
 					} catch (error) {
 						console.error('Error displaying turn:', error);
 						alert('Failed to load turn data');
@@ -768,9 +766,17 @@ for (const run of runMetadata) {
 					}
 				}
 
-				// Event listeners
-				agentSelect.addEventListener('change', loadTurnHistory);
-				seedSelect.addEventListener('change', loadTurnHistory);
+				// Event listeners for table cells
+				const clickableCells = document.querySelectorAll('.outcomes-table td.clickable');
+				clickableCells.forEach(cell => {
+					cell.addEventListener('click', () => {
+						const agent = cell.getAttribute('data-agent');
+						const seed = cell.getAttribute('data-seed');
+						console.log('Cell clicked:', { agent, seed });
+						loadTurnHistory(agent, seed, cell);
+					});
+				});
+
 				prevButton.addEventListener('click', goToPreviousTurn);
 				nextButton.addEventListener('click', goToNextTurn);
 
@@ -784,11 +790,6 @@ for (const run of runMetadata) {
 						goToNextTurn();
 					}
 				});
-
-				// Auto-load turn history if default values are set
-				if (agentSelect.value && seedSelect.value) {
-					loadTurnHistory();
-				}
 			});
 		</script>
 	</body>
