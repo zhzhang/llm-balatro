@@ -1,551 +1,927 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import BaseHead from "../components/BaseHead.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import { readFile } from "fs/promises";
+import { join } from "path";
 
 // Load turn history index from static files
-const indexPath = join(process.cwd(), 'public', 'turn-history', 'index.json');
-const indexContent = await readFile(indexPath, 'utf-8');
+const indexPath = join(process.cwd(), "public", "turn-history", "index.json");
+const indexContent = await readFile(indexPath, "utf-8");
 const runMetadata = JSON.parse(indexContent) as Array<{
-	agent: string;
-	seed: string;
-	runId: string;
-	outcome: string;
-	turns: number[];
+  agent: string;
+  seed: string;
+  runId: string;
+  outcome: string;
+  turns: number[];
 }>;
 
 // Get unique agents and seeds
-const agents = [...new Set(runMetadata.map(r => r.agent))].sort();
-const seeds = [...new Set(runMetadata.map(r => r.seed))].sort();
+const agents = [...new Set(runMetadata.map((r) => r.agent))].sort();
+const seeds = [...new Set(runMetadata.map((r) => r.seed))].sort();
 
 // Create a map for quick lookup: agent -> seed -> outcome
 const outcomeMap = new Map<string, Map<string, string>>();
 for (const run of runMetadata) {
-	if (!outcomeMap.has(run.agent)) {
-		outcomeMap.set(run.agent, new Map());
-	}
-	outcomeMap.get(run.agent)!.set(run.seed, run.outcome);
+  if (!outcomeMap.has(run.agent)) {
+    outcomeMap.set(run.agent, new Map());
+  }
+  outcomeMap.get(run.agent)!.set(run.seed, run.outcome);
 }
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			/* Custom CSS variables for colors not in Tailwind theme */
-			:root {
-				--text-link: var(--color-accent);
-			}
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      /* Custom CSS variables for colors not in Tailwind theme */
+      :root {
+        --text-link: var(--color-accent);
+      }
 
-			/* Selected table cell outline */
-			td.selected {
-				outline: 3px solid #2563eb;
-				outline-offset: -3px;
-			}
+      /* Selected table cell outline */
+      td.selected {
+        outline: 3px solid #2563eb;
+        outline-offset: -3px;
+      }
 
-			/* Term popover tooltips */
-			.term-popover::after {
-				content: attr(data-definition);
-				position: absolute;
-				bottom: 100%;
-				left: 50%;
-				transform: translateX(-50%) translateY(-8px);
-				background-color: rgba(0, 0, 0, 0.9);
-				color: white;
-				padding: 0.75rem 1rem;
-				border-radius: 6px;
-				font-size: 0.875rem;
-				line-height: 1.5;
-				white-space: normal;
-				width: max-content;
-				max-width: 280px;
-				text-align: left;
-				opacity: 0;
-				pointer-events: none;
-				transition: opacity 0.2s ease, transform 0.2s ease;
-				z-index: 1000;
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-			}
+      /* Term popover tooltips */
+      .term-popover::after {
+        content: attr(data-definition);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        white-space: normal;
+        width: max-content;
+        max-width: 280px;
+        text-align: left;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
 
-			.term-popover::before {
-				content: '';
-				position: absolute;
-				bottom: 100%;
-				left: 50%;
-				transform: translateX(-50%) translateY(-2px);
-				border: 6px solid transparent;
-				border-top-color: rgba(0, 0, 0, 0.9);
-				opacity: 0;
-				pointer-events: none;
-				transition: opacity 0.2s ease, transform 0.2s ease;
-				z-index: 1000;
-			}
+      .term-popover::before {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-2px);
+        border: 6px solid transparent;
+        border-top-color: rgba(0, 0, 0, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+        z-index: 1000;
+      }
 
-			.term-popover:hover::after,
-			.term-popover:hover::before {
-				opacity: 1;
-				transform: translateX(-50%) translateY(-4px);
-			}
+      .term-popover:hover::after,
+      .term-popover:hover::before {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-4px);
+      }
 
-			.term-popover:hover::before {
-				transform: translateX(-50%) translateY(2px);
-			}
+      .term-popover:hover::before {
+        transform: translateX(-50%) translateY(2px);
+      }
 
-			@media (max-width: 768px) {
-				main {
-					padding: 4rem 1.5rem !important;
-				}
-				
-				.article-header {
-					margin-bottom: 3rem !important;
-				}
-				
-				.article-subtitle {
-					font-size: 1.125rem !important;
-				}
-				
-				.table-container {
-					width: calc(100vw - 3rem) !important;
-					overflow-x: auto;
-				}
+      @media (max-width: 768px) {
+        main {
+          padding: 4rem 1.5rem !important;
+        }
 
-				#turn-history-section {
-					padding: 1rem !important;
-					width: calc(100vw - 3rem) !important;
-				}
+        .article-header {
+          margin-bottom: 3rem !important;
+        }
 
-				.turn-display {
-					grid-template-columns: 1fr !important;
-				}
+        .article-subtitle {
+          font-size: 1.125rem !important;
+        }
 
-				.turn-details {
-					height: auto !important;
-					max-height: 500px !important;
-				}
+        .table-container {
+          width: calc(100vw - 3rem) !important;
+          overflow-x: auto;
+        }
 
-				.turn-controls {
-					grid-template-columns: 1fr !important;
-					grid-template-rows: auto auto auto !important;
-					gap: 0.75rem !important;
-				}
-				
-				.turn-controls button:first-child {
-					justify-self: stretch !important;
-				}
-				
-				.turn-controls button:last-child {
-					justify-self: stretch !important;
-				}
+        #turn-history-section {
+          padding: 1rem !important;
+          width: calc(100vw - 3rem) !important;
+        }
 
-				.turn-controls button {
-					width: 100% !important;
-				}
+        .turn-display {
+          grid-template-columns: 1fr !important;
+        }
 
-				.term-popover::after {
-					max-width: 200px !important;
-					font-size: 0.8rem !important;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<main class="max-w-[760px] mx-auto py-20 px-8">
-			<header class="article-header mb-16 pb-8 border-b" style="border-color: var(--color-border-light);">
-				<h1 class="mb-4">Can LLMs beat Balatro?</h1>
-				<p class="article-subtitle text-xl font-normal leading-relaxed" style="font-family: var(--font-family-serif); color: var(--color-text-secondary);">
-					In short: yes, and now I'm betting on Google to win the AI race.
-				</p>
-			<p class="text-sm mt-2 flex items-center gap-3" style="color: var(--color-text-secondary);">
-				<a href="https://www.linkedin.com/in/zhjzhang/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)]" style="color: var(--color-accent);">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] fill-current">
-						<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-					</svg>
-					Jordan Zhang
-				</a>
-				<span>•</span>
-				<a href="https://github.com/zhzhang/llm-balatro/tree/main/experiment-code" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)]" style="color: var(--color-accent);">
-					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] fill-current">
-						<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-					</svg>
-					Code
-				</a>
-			</p>
-			</header>
-			
-			<article class="leading-[1.8]">
-				<p>
-					<strong>Balatro</strong> is a <span class="relative underline decoration-dotted cursor-help" style="text-decoration-color: var(--color-accent); color: inherit;" data-definition="A game genre where progress is procedurally generated, features permanent death, and requires players to restart from the beginning when they die.">roguelike</span> <span class="relative underline decoration-dotted cursor-help" style="text-decoration-color: var(--color-accent); color: inherit;" data-definition="A game genre where players build and customize a deck of cards throughout the game, making strategic choices about which cards to add, remove, or upgrade.">deckbuilder</span> based on poker that was released in 2024.
-					Players play poker hands to earn chips and pass rounds, trying to exceed exponentially increasing chip requirement as rounds progress.
-				</p>
+        .turn-details {
+          height: auto !important;
+          max-height: 500px !important;
+        }
 
-				<div class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start">
-					<div class="flex-1 flex flex-col items-center">
-						<img src="/gifs/balatro-1.gif" alt="Balatro gameplay 1" class="w-full h-auto rounded-lg shadow-md" />
-						<p class="mt-3 text-[0.85rem] text-center" style="color: var(--color-text-secondary);">1. Start playing regular poker hands to earn money.</p>
-					</div>
-					<div class="flex-1 flex flex-col items-center">
-						<img src="/gifs/balatro-2.gif" alt="Balatro gameplay 2" class="w-full h-auto rounded-lg shadow-md" />
-						<p class="mt-3 text-[0.85rem] text-center" style="color: var(--color-text-secondary);">2. Buy and use power ups to stack the deck in your favor.</p>
-					</div>
-					<div class="flex-1 flex flex-col items-center">
-						<img src="/gifs/balatro-3.gif" alt="Balatro gameplay 3" class="w-full h-auto rounded-lg shadow-md" />
-						<p class="mt-3 text-[0.85rem] text-center" style="color: var(--color-text-secondary);">3. Build OP combos and win the game.</p>
-					</div>
-				</div>
+        .turn-controls {
+          grid-template-columns: 1fr !important;
+          grid-template-rows: auto auto auto !important;
+          gap: 0.75rem !important;
+        }
 
-				<p>
-					Balatro is an interesting test bed for LLM reasoning:
-				</p>
-				<ul>
-					<li>The game is stochastic with an enormous branching factor, requiring probabilistic reasoning to make optimal decisions.</li>
-					<li>Long sequences of planning and execution are needed to keep up with the exponentially increasing chip requirement.</li>
-					<li>The game .</li>
-				</ul>
-				<p>
-					Good Balatro play requires picking the best move at any state, while how that move may change the trajectory of the game dozens of turns down the line.
-				</p>
+        .turn-controls button:first-child {
+          justify-self: stretch !important;
+        }
 
-				<p>
-					The state and the agent's reasoning and actions for the last 3 turns are also given.
-				</p>
+        .turn-controls button:last-child {
+          justify-self: stretch !important;
+        }
 
-				<p>
-					I ran had models from OpenAI, Claude, and Google each play 10 games using the same set of run seeds.
-					I used the maximum thinking effort setting for each model.
+        .turn-controls button {
+          width: 100% !important;
+        }
 
-					I also include the average cost per turn for each model.
-				</p>				
+        .term-popover::after {
+          max-width: 200px !important;
+          font-size: 0.8rem !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="max-w-[760px] mx-auto py-20 px-8">
+      <header
+        class="article-header mb-16 pb-8 border-b"
+        style="border-color: var(--color-border-light);"
+      >
+        <h1 class="mb-4">Can LLMs beat Balatro?</h1>
+        <p
+          class="article-subtitle text-xl font-normal leading-relaxed"
+          style="font-family: var(--font-family-serif); color: var(--color-text-secondary);"
+        >
+          In short: yes, and now I'm betting on Google to win the AI race.
+        </p>
+        <p
+          class="text-sm mt-2 flex items-center gap-3"
+          style="color: var(--color-text-secondary);"
+        >
+          <a
+            href="https://www.linkedin.com/in/zhjzhang/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)]"
+            style="color: var(--color-accent);"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-[18px] h-[18px] fill-current"
+            >
+              <path
+                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+              ></path>
+            </svg>
+            Jordan Zhang
+          </a>
+          <span>•</span>
+          <a
+            href="https://github.com/zhzhang/llm-balatro/tree/main/experiment-code"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)]"
+            style="color: var(--color-accent);"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-[18px] h-[18px] fill-current"
+            >
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              ></path>
+            </svg>
+            Code
+          </a>
+        </p>
+      </header>
 
-			
-				<div class="table-container my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2">
-					<table class="outcomes-table w-full border-collapse text-sm">
-						<thead>
-							<tr>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">Seed</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">Cost per turn</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">22V4E3UE</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">2JW2IH4X</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">422J6NUH</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">5U4K91D8</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">84N5GIYF</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">H1Z58VZ6</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">M3F6LPGY</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">M8KADSBQ</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">PE93PR87</th>
-								<th class="p-3 text-center border font-semibold sticky top-0" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">U15QWQGE</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<th class="p-3 border font-semibold text-left" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">claude-4.5-sonnet</th>
-								<td class="p-3 text-center border" style="border-color: var(--color-border-light);">$0.058</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="22V4E3UE">Ante 6</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="2JW2IH4X">Ante 6</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="422J6NUH">Ante 5</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="5U4K91D8">Ante 6</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="84N5GIYF">Ante 4</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="H1Z58VZ6">Ante 5</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="M3F6LPGY">Ante 2</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="M8KADSBQ">Ante 5</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="PE93PR87">Ante 3</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="claude" data-seed="U15QWQGE">Ante 4</td>
-							</tr>
-							<tr>
-								<th class="p-3 border font-semibold text-left" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">gpt-5.2</th>
-								<td class="p-3 text-center border" style="border-color: var(--color-border-light);">$0.034</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="22V4E3UE">Ante 5</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="2JW2IH4X">Ante 5</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="422J6NUH">Ante 7</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="5U4K91D8">Ante 7</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="84N5GIYF">WON</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="H1Z58VZ6">Ante 6</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="M3F6LPGY">Ante 4</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="M8KADSBQ">Ante 5</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="PE93PR87">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="openai" data-seed="U15QWQGE">WON</td>
-							</tr>
-							<tr>
-								<th class="p-3 border font-semibold text-left" style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);">gemini-3-flash</th>
-								<td class="p-3 text-center border" style="border-color: var(--color-border-light);">$0.008</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="22V4E3UE">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="2JW2IH4X">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="422J6NUH">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="5U4K91D8">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="84N5GIYF">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="H1Z58VZ6">WON</td>
-								<td class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="M3F6LPGY">Ante 4</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="M8KADSBQ">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="PE93PR87">WON</td>
-								<td class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold" style="border-color: var(--color-border-light);" data-agent="gemini" data-seed="U15QWQGE">WON</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+      <article class="leading-[1.8]">
+        <p>
+          <strong>Balatro</strong> is a <span
+            class="relative underline decoration-dotted cursor-help"
+            style="text-decoration-color: var(--color-accent); color: inherit;"
+            data-definition="A game genre where progress is procedurally generated, features permanent death, and requires players to restart from the beginning when they die."
+            >roguelike</span
+          >
+          <span
+            class="relative underline decoration-dotted cursor-help"
+            style="text-decoration-color: var(--color-accent); color: inherit;"
+            data-definition="A game genre where players build and customize a deck of cards throughout the game, making strategic choices about which cards to add, remove, or upgrade."
+            >deckbuilder</span
+          > based on poker that was released in 2024. Players play poker hands to
+          earn chips and pass rounds, trying to exceed exponentially increasing chip
+          requirement as rounds progress.
+        </p>
 
-				<div class="my-8 p-6 rounded-lg w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2" style="background-color: var(--color-bg-secondary);" id="turn-history-section">
-					<p id="turn-history-instructions" class="mb-4" style="color: var(--color-text-secondary);">Click any cell in the table above to view the turn-by-turn history of that run.</p>
+        <div
+          class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start"
+        >
+          <div class="flex-1 flex flex-col items-center">
+            <img
+              src="/gifs/balatro-1.gif"
+              alt="Balatro gameplay 1"
+              class="w-full h-auto rounded-lg shadow-md"
+            />
+            <p
+              class="mt-3 text-[0.85rem] text-center"
+              style="color: var(--color-text-secondary);"
+            >
+              1. Start playing regular poker hands to earn money.
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col items-center">
+            <img
+              src="/gifs/balatro-2.gif"
+              alt="Balatro gameplay 2"
+              class="w-full h-auto rounded-lg shadow-md"
+            />
+            <p
+              class="mt-3 text-[0.85rem] text-center"
+              style="color: var(--color-text-secondary);"
+            >
+              2. Buy and use power ups to stack the deck in your favor.
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col items-center">
+            <img
+              src="/gifs/balatro-3.gif"
+              alt="Balatro gameplay 3"
+              class="w-full h-auto rounded-lg shadow-md"
+            />
+            <p
+              class="mt-3 text-[0.85rem] text-center"
+              style="color: var(--color-text-secondary);"
+            >
+              3. Build OP combos and win the game.
+            </p>
+          </div>
+        </div>
 
-					<div id="turn-browser" class="mt-4" style="display: none;">
-						<div class="turn-display grid grid-cols-[60%_40%] gap-4">
-							<div class="bg-white p-4 rounded">
-								<div class="turn-controls grid grid-cols-[1fr_auto_1fr] gap-4 items-center mb-4">
-									<button id="prev-turn" disabled class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-start hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600">← Previous Turn</button>
-									<span id="turn-counter" class="font-semibold text-lg text-center whitespace-nowrap">Turn 0 / 0</span>
-									<button id="next-turn" disabled class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-end hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600">Next Turn →</button>
-								</div>
-								<img id="screenshot-img" alt="Game state screenshot" class="w-full h-auto border rounded block" style="border-color: var(--color-border-light);" />
-							</div>
+        <p>Balatro is an interesting test bed for LLM reasoning:</p>
+        <ul>
+          <li>
+            The game is stochastic with an enormous branching factor, requiring
+            probabilistic reasoning to make optimal decisions.
+          </li>
+          <li>
+            Long sequences of planning and execution are needed to keep up with
+            the exponentially increasing chip requirement.
+          </li>
+          <li>The game .</li>
+        </ul>
+        <p>
+          Good Balatro play requires picking the best move at any state, while
+          how that move may change the trajectory of the game dozens of turns
+          down the line.
+        </p>
 
-							<div class="turn-details bg-white p-4 rounded overflow-y-auto">
-								<div class="mb-6 last:mb-0">
-									<h3 class="mt-0 mb-2">Action</h3>
-									<pre id="action-text" class="bg-gray-100 p-3 rounded overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 m-0"></pre>
-								</div>
+        <p>
+          The state and the agent's reasoning and actions for the last 3 turns
+          are also given.
+        </p>
 
-								<div class="mb-6 last:mb-0">
-									<h3 class="mt-0 mb-2">Reasoning</h3>
-									<pre id="reasoning-text" class="bg-gray-100 p-3 rounded overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 m-0"></pre>
-								</div>
-							</div>
-						</div>
-					</div>
+        <p>
+          I ran had models from OpenAI, Claude, and Google each play 10 games
+          using the same set of run seeds. I used the maximum thinking effort
+          setting for each model. I also include the average cost per turn for
+          each model.
+        </p>
 
-					<div id="loading-message" class="text-center py-8" style="display: none;">
-						Loading turn history...
-					</div>
-				</div>
-				<p>
-					Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2, despite the latter being bigger and more expensive.
-				</p>
+        <div
+          class="table-container my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2"
+        >
+          <table class="outcomes-table w-full border-collapse text-sm">
+            <thead>
+              <tr>
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >Seed</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >Cost per turn</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >22V4E3UE</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >2JW2IH4X</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >422J6NUH</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >5U4K91D8</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >84N5GIYF</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >H1Z58VZ6</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >M3F6LPGY</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >M8KADSBQ</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >PE93PR87</th
+                >
+                <th
+                  class="p-3 text-center border font-semibold sticky top-0"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >U15QWQGE</th
+                >
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th
+                  class="p-3 border font-semibold text-left"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >claude-4.5-sonnet</th
+                >
+                <td
+                  class="p-3 text-center border"
+                  style="border-color: var(--color-border-light);">$0.058</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="22V4E3UE">Ante 6</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="2JW2IH4X">Ante 6</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="422J6NUH">Ante 5</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="5U4K91D8">Ante 6</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="84N5GIYF">Ante 4</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="H1Z58VZ6">Ante 5</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="M3F6LPGY">Ante 2</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="M8KADSBQ">Ante 5</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="PE93PR87">Ante 3</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="claude"
+                  data-seed="U15QWQGE">Ante 4</td
+                >
+              </tr>
+              <tr>
+                <th
+                  class="p-3 border font-semibold text-left"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >gpt-5.2</th
+                >
+                <td
+                  class="p-3 text-center border"
+                  style="border-color: var(--color-border-light);">$0.034</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="22V4E3UE">Ante 5</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="2JW2IH4X">Ante 5</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="422J6NUH">Ante 7</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="5U4K91D8">Ante 7</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="84N5GIYF">WON</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="H1Z58VZ6">Ante 6</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="M3F6LPGY">Ante 4</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="M8KADSBQ">Ante 5</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="PE93PR87">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="openai"
+                  data-seed="U15QWQGE">WON</td
+                >
+              </tr>
+              <tr>
+                <th
+                  class="p-3 border font-semibold text-left"
+                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
+                  >gemini-3-flash</th
+                >
+                <td
+                  class="p-3 text-center border"
+                  style="border-color: var(--color-border-light);">$0.008</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="22V4E3UE">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="2JW2IH4X">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="422J6NUH">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="5U4K91D8">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="84N5GIYF">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="H1Z58VZ6">WON</td
+                >
+                <td
+                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="M3F6LPGY">Ante 4</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="M8KADSBQ">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="PE93PR87">WON</td
+                >
+                <td
+                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  style="border-color: var(--color-border-light);"
+                  data-agent="gemini"
+                  data-seed="U15QWQGE">WON</td
+                >
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p
+          id="turn-history-instructions"
+          class="mb-4"
+          style="color: var(--color-text-secondary);"
+        >
+          Click any cell in the table above to view the turn-by-turn history of
+          that run.
+        </p>
 
+        <div
+          class="my-8 p-6 rounded-lg w-[calc(100vw-4rem)] max-w-screen"
+          style="background-color: var(--color-bg-secondary);"
+          id="turn-history-section"
+        >
+          <div
+            id="turn-browser"
+            class="turn-display grid grid-cols-[60%_40%] max-h-100"
+            style="display: none;"
+          >
+            <div class="bg-white p-4 rounded">
+              <div
+                class="turn-controls grid grid-cols-[1fr_auto_1fr] gap-4 items-center mb-4"
+              >
+                <button
+                  id="prev-turn"
+                  disabled
+                  class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-start hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600"
+                  >← Previous Turn</button
+                >
+                <span
+                  id="turn-counter"
+                  class="font-semibold text-lg text-center whitespace-nowrap"
+                  >Turn 0 / 0</span
+                >
+                <button
+                  id="next-turn"
+                  disabled
+                  class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-end hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600"
+                  >Next Turn →</button
+                >
+              </div>
+              <img
+                id="screenshot-img"
+                alt="Game state screenshot"
+                class="w-full h-auto border rounded block"
+                style="border-color: var(--color-border-light);"
+              />
+            </div>
 
-				<p>
-					The reason for this gap, Google's secret weapon in the current AI race: Youtube.
-					When I originally started the agent development with Claude, performance was poor, and I looked for a textual guide to see if I could hand the manual strategy for success.
-					(I also tried briefly implementing Reflexion, as well as an AlphaEvolve-based evolutionary algorithm)
+            <div class="turn-details bg-white p-4 rounded overflow-y-auto">
+              <div class="mb-6 last:mb-0">
+                <h3 class="mt-0 mb-2">Action</h3>
+                <pre
+                  id="action-text"
+                  class="bg-gray-100 p-3 rounded overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 m-0">
+                </pre>
+              </div>
 
-					Good, comprehensive text-based guides were very hard to find, but Youtube had tons of content from streamers, breaking down strategies and gameplay.
-					When watching gemini play, I noticed within the first couple of Antes that it knew more about the game than the other two models, certainly more than was possible from the state context I was giving it.
-				</p>
+              <div class="mb-6 last:mb-0">
+                <h3 class="mt-0 mb-2">Reasoning</h3>
+                <pre
+                  id="reasoning-text"
+                  class="bg-gray-100 p-3 rounded overflow-x-auto whitespace-pre-wrap break-words font-mono text-sm leading-6 m-0">
+                </pre>
+              </div>
+            </div>
+          </div>
 
-				<p>
-					At the end of the day, the Bitter Lesson is that this AI race is about scaling compute and data, and teams that have access to more and better of both will win.
+          <div
+            id="loading-message"
+            class="text-center py-8"
+            style="display: none;"
+          >
+            Loading turn history...
+          </div>
+        </div>
+        <p>
+          Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
+          despite the latter being bigger and more expensive.
+        </p>
 
-					This experiment has woken me up to how unfair of an advantage Youtube is in the AI race.
+        <p>
+          The reason for this gap, Google's secret weapon in the current AI
+          race: Youtube. When I originally started the agent development with
+          Claude, performance was poor, and I looked for a textual guide to see
+          if I could hand the manual strategy for success. (I also tried briefly
+          implementing Reflexion, as well as an AlphaEvolve-based evolutionary
+          algorithm) Good, comprehensive text-based guides were very hard to
+          find, but Youtube had tons of content from streamers, breaking down
+          strategies and gameplay. When watching gemini play, I noticed within
+          the first couple of Antes that it knew more about the game than the
+          other two models, certainly more than was possible from the state
+          context I was giving it.
+        </p>
 
-					The sheer amount of high fidelity multi-modal explanations of pretty much any topic you can imagine creates a data moat that companies starting from scraping the internet struggle to match.
+        <p>
+          At the end of the day, the Bitter Lesson is that this AI race is about
+          scaling compute and data, and teams that have access to more and
+          better of both will win. This experiment has woken me up to how unfair
+          of an advantage Youtube is in the AI race. The sheer amount of high
+          fidelity multi-modal explanations of pretty much any topic you can
+          imagine creates a data moat that companies starting from scraping the
+          internet struggle to match. If you have the right data for a specific
+          domain, you can create outsize impact for 10x cheaper.
+        </p>
+      </article>
+    </main>
 
-					If you have the right data for a specific domain, you can create outsize impact for 10x cheaper.
-				</p>
-			</article>
-		</main>
+    <script is:inline define:vars={{ runMetadata }}>
+      // Wait for DOM to be ready
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM loaded, runMetadata entries:", runMetadata.length);
 
-		<script is:inline define:vars={{ runMetadata }}>
-			// Wait for DOM to be ready
-			document.addEventListener('DOMContentLoaded', () => {
-				console.log('DOM loaded, runMetadata entries:', runMetadata.length);
-				
-				// Create a map for quick lookup: agent -> seed -> metadata
-				const metadataMap = new Map();
-				for (const run of runMetadata) {
-					if (!metadataMap.has(run.agent)) {
-						metadataMap.set(run.agent, new Map());
-					}
-					metadataMap.get(run.agent).set(run.seed, run);
-				}
-				
-				console.log('Metadata map created, agents:', Array.from(metadataMap.keys()));
+        // Create a map for quick lookup: agent -> seed -> metadata
+        const metadataMap = new Map();
+        for (const run of runMetadata) {
+          if (!metadataMap.has(run.agent)) {
+            metadataMap.set(run.agent, new Map());
+          }
+          metadataMap.get(run.agent).set(run.seed, run);
+        }
 
-				let currentAgent = '';
-				let currentSeed = '';
-				let currentMetadata = null;
-				let currentTurnIndex = 0;
-				let selectedCell = null;
+        console.log(
+          "Metadata map created, agents:",
+          Array.from(metadataMap.keys()),
+        );
 
-				const turnHistorySection = document.getElementById('turn-history-section');
-				const turnHistoryInstructions = document.getElementById('turn-history-instructions');
-				const turnBrowser = document.getElementById('turn-browser');
-				const loadingMessage = document.getElementById('loading-message');
-				const prevButton = document.getElementById('prev-turn');
-				const nextButton = document.getElementById('next-turn');
-				const turnCounter = document.getElementById('turn-counter');
-				const screenshotImg = document.getElementById('screenshot-img');
-				const screenshotContainer = document.querySelector('.turn-screenshot');
-				const turnDetails = document.querySelector('.turn-details');
-				const actionText = document.getElementById('action-text');
-				const reasoningText = document.getElementById('reasoning-text');
+        let currentAgent = "";
+        let currentSeed = "";
+        let currentMetadata = null;
+        let currentTurnIndex = 0;
+        let selectedCell = null;
 
-				// Function to match turn-details height to screenshot container
-				function matchDetailsHeight() {
-					if (screenshotContainer && turnDetails) {
-						const height = screenshotContainer.offsetHeight;
-						turnDetails.style.height = height + 'px';
-					}
-				}
+        const turnHistorySection = document.getElementById(
+          "turn-history-section",
+        );
+        const turnHistoryInstructions = document.getElementById(
+          "turn-history-instructions",
+        );
+        const turnBrowser = document.getElementById("turn-browser");
+        const loadingMessage = document.getElementById("loading-message");
+        const prevButton = document.getElementById("prev-turn");
+        const nextButton = document.getElementById("next-turn");
+        const turnCounter = document.getElementById("turn-counter");
+        const screenshotImg = document.getElementById("screenshot-img");
+        const screenshotContainer = document.querySelector(".turn-screenshot");
+        const turnDetails = document.querySelector(".turn-details");
+        const actionText = document.getElementById("action-text");
+        const reasoningText = document.getElementById("reasoning-text");
 
-				async function loadTurnHistory(agent, seed, clickedCell) {
-					if (!agent || !seed) {
-						turnBrowser.style.display = 'none';
-						return;
-					}
+        // Function to match turn-details height to screenshot container
+        function matchDetailsHeight() {
+          if (screenshotContainer && turnDetails) {
+            const height = screenshotContainer.offsetHeight;
+            turnDetails.style.height = height + "px";
+          }
+        }
 
-					// Update selected cell styling
-					if (selectedCell) {
-						selectedCell.classList.remove('selected');
-					}
-					selectedCell = clickedCell;
-					if (selectedCell) {
-						selectedCell.classList.add('selected');
-					}
+        async function loadTurnHistory(agent, seed, clickedCell) {
+          if (!agent || !seed) {
+            turnBrowser.style.display = "none";
+            return;
+          }
 
-					// Show loading
-					turnBrowser.style.display = 'none';
-					loadingMessage.style.display = 'block';
-					turnHistoryInstructions.style.display = 'none';
+          // Update selected cell styling
+          if (selectedCell) {
+            selectedCell.classList.remove("selected");
+          }
+          selectedCell = clickedCell;
+          if (selectedCell) {
+            selectedCell.classList.add("selected");
+          }
 
-					try {
-						// Get metadata from the pre-loaded map
-						if (!metadataMap.has(agent) || !metadataMap.get(agent).has(seed)) {
-							throw new Error('No metadata found for this agent/seed combination');
-						}
+          // Show loading
+          turnBrowser.style.display = "none";
+          loadingMessage.style.display = "block";
+          turnHistoryInstructions.style.display = "none";
 
-						currentMetadata = metadataMap.get(agent).get(seed);
-						currentAgent = agent;
-						currentSeed = seed;
-						currentTurnIndex = 0;
+          try {
+            // Get metadata from the pre-loaded map
+            if (!metadataMap.has(agent) || !metadataMap.get(agent).has(seed)) {
+              throw new Error(
+                "No metadata found for this agent/seed combination",
+              );
+            }
 
-						if (!currentMetadata.turns || currentMetadata.turns.length === 0) {
-							alert('No turn history found for this game');
-							loadingMessage.style.display = 'none';
-							return;
-						}
+            currentMetadata = metadataMap.get(agent).get(seed);
+            currentAgent = agent;
+            currentSeed = seed;
+            currentTurnIndex = 0;
 
-						// Show browser and display first turn
-						loadingMessage.style.display = 'none';
-						turnBrowser.style.display = 'block';
-						await displayTurn();
+            if (!currentMetadata.turns || currentMetadata.turns.length === 0) {
+              alert("No turn history found for this game");
+              loadingMessage.style.display = "none";
+              return;
+            }
 
-						// Scroll to turn history section
-						turnHistorySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-					} catch (error) {
-						console.error('Error loading turn history:', error);
-						alert('Failed to load turn history. Check console for details.');
-						loadingMessage.style.display = 'none';
-					}
-				}
+            // Show browser and display first turn
+            loadingMessage.style.display = "none";
+            turnBrowser.style.display = "block";
+            await displayTurn();
 
-				async function displayTurn() {
-					if (!currentMetadata || !currentMetadata.turns.length) return;
+            // Scroll to turn history section
+            turnHistorySection.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          } catch (error) {
+            console.error("Error loading turn history:", error);
+            alert("Failed to load turn history. Check console for details.");
+            loadingMessage.style.display = "none";
+          }
+        }
 
-					const turnNumber = currentMetadata.turns[currentTurnIndex];
-					
-					try {
-						// Load turn data
-						const turnResponse = await fetch(`/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.json`);
-						if (!turnResponse.ok) {
-							throw new Error('Failed to fetch turn data');
-						}
-						const turnData = await turnResponse.json();
-						
-						// Update turn counter
-						turnCounter.textContent = `Turn ${turnData.turn}${turnData.ante ? ` (Ante ${turnData.ante})` : ''} — ${currentTurnIndex + 1} / ${currentMetadata.turns.length}`;
+        async function displayTurn() {
+          if (!currentMetadata || !currentMetadata.turns.length) return;
 
-						// Update screenshot
-						if (turnData.hasScreenshot) {
-							screenshotImg.src = `/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.png`;
-							screenshotImg.style.display = 'block';
-							
-							// Match heights when image loads
-							screenshotImg.onload = () => {
-								matchDetailsHeight();
-							};
-						} else {
-							screenshotImg.style.display = 'none';
-						}
+          const turnNumber = currentMetadata.turns[currentTurnIndex];
 
-						// Update action text
-						actionText.textContent = turnData.action || 'No action data available';
+          try {
+            // Load turn data
+            const turnResponse = await fetch(
+              `/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.json`,
+            );
+            if (!turnResponse.ok) {
+              throw new Error("Failed to fetch turn data");
+            }
+            const turnData = await turnResponse.json();
 
-						// Update reasoning text
-						reasoningText.textContent = turnData.reasoning || 'No reasoning data available';
+            // Update turn counter
+            turnCounter.textContent = `Turn ${turnData.turn}${turnData.ante ? ` (Ante ${turnData.ante})` : ""} — ${currentTurnIndex + 1} / ${currentMetadata.turns.length}`;
 
-						// Match heights in case image is cached
-						setTimeout(matchDetailsHeight, 100);
+            // Update screenshot
+            if (turnData.hasScreenshot) {
+              screenshotImg.src = `/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.png`;
+              screenshotImg.style.display = "block";
 
-						// Update button states
-						const isPrevDisabled = currentTurnIndex === 0;
-						const isNextDisabled = currentTurnIndex === currentMetadata.turns.length - 1;
-						console.log('Turn navigation:', {
-							currentTurnIndex,
-							totalTurns: currentMetadata.turns.length,
-							isPrevDisabled,
-							isNextDisabled
-						});
-						prevButton.disabled = isPrevDisabled;
-						nextButton.disabled = isNextDisabled;
-					} catch (error) {
-						console.error('Error displaying turn:', error);
-						alert('Failed to load turn data');
-					}
-				}
+              // Match heights when image loads
+              screenshotImg.onload = () => {
+                matchDetailsHeight();
+              };
+            } else {
+              screenshotImg.style.display = "none";
+            }
 
-				async function goToPreviousTurn() {
-					if (currentTurnIndex > 0) {
-						currentTurnIndex--;
-						await displayTurn();
-					}
-				}
+            // Update action text
+            actionText.textContent =
+              turnData.action || "No action data available";
 
-				async function goToNextTurn() {
-					if (currentMetadata && currentTurnIndex < currentMetadata.turns.length - 1) {
-						currentTurnIndex++;
-						await displayTurn();
-					}
-				}
+            // Update reasoning text
+            reasoningText.textContent =
+              turnData.reasoning || "No reasoning data available";
 
-				// Event listeners for table cells
-				const clickableCells = document.querySelectorAll('.outcomes-table td.clickable');
-				clickableCells.forEach(cell => {
-					cell.addEventListener('click', () => {
-						const agent = cell.getAttribute('data-agent');
-						const seed = cell.getAttribute('data-seed');
-						console.log('Cell clicked:', { agent, seed });
-						loadTurnHistory(agent, seed, cell);
-					});
-				});
+            // Match heights in case image is cached
+            setTimeout(matchDetailsHeight, 100);
 
-				prevButton.addEventListener('click', goToPreviousTurn);
-				nextButton.addEventListener('click', goToNextTurn);
+            // Update button states
+            const isPrevDisabled = currentTurnIndex === 0;
+            const isNextDisabled =
+              currentTurnIndex === currentMetadata.turns.length - 1;
+            console.log("Turn navigation:", {
+              currentTurnIndex,
+              totalTurns: currentMetadata.turns.length,
+              isPrevDisabled,
+              isNextDisabled,
+            });
+            prevButton.disabled = isPrevDisabled;
+            nextButton.disabled = isNextDisabled;
+          } catch (error) {
+            console.error("Error displaying turn:", error);
+            alert("Failed to load turn data");
+          }
+        }
 
-				// Keyboard navigation
-				document.addEventListener('keydown', (e) => {
-					if (turnBrowser.style.display === 'none') return;
-					
-					if (e.key === 'ArrowLeft') {
-						goToPreviousTurn();
-					} else if (e.key === 'ArrowRight') {
-						goToNextTurn();
-					}
-				});
+        async function goToPreviousTurn() {
+          if (currentTurnIndex > 0) {
+            currentTurnIndex--;
+            await displayTurn();
+          }
+        }
 
-				// Window resize handler
-				window.addEventListener('resize', () => {
-					if (turnBrowser.style.display !== 'none') {
-						matchDetailsHeight();
-					}
-				});
+        async function goToNextTurn() {
+          if (
+            currentMetadata &&
+            currentTurnIndex < currentMetadata.turns.length - 1
+          ) {
+            currentTurnIndex++;
+            await displayTurn();
+          }
+        }
 
-				// Auto-select first cell on page load
-				if (clickableCells.length > 0) {
-					const firstCell = clickableCells[0];
-					const agent = firstCell.getAttribute('data-agent');
-					const seed = firstCell.getAttribute('data-seed');
-					console.log('Auto-loading first cell:', { agent, seed });
-					loadTurnHistory(agent, seed, firstCell);
-				}
-			});
-		</script>
-	</body>
+        // Event listeners for table cells
+        const clickableCells = document.querySelectorAll(
+          ".outcomes-table td.clickable",
+        );
+        clickableCells.forEach((cell) => {
+          cell.addEventListener("click", () => {
+            const agent = cell.getAttribute("data-agent");
+            const seed = cell.getAttribute("data-seed");
+            console.log("Cell clicked:", { agent, seed });
+            loadTurnHistory(agent, seed, cell);
+          });
+        });
+
+        prevButton.addEventListener("click", goToPreviousTurn);
+        nextButton.addEventListener("click", goToNextTurn);
+
+        // Keyboard navigation
+        document.addEventListener("keydown", (e) => {
+          if (turnBrowser.style.display === "none") return;
+
+          if (e.key === "ArrowLeft") {
+            goToPreviousTurn();
+          } else if (e.key === "ArrowRight") {
+            goToNextTurn();
+          }
+        });
+
+        // Window resize handler
+        window.addEventListener("resize", () => {
+          if (turnBrowser.style.display !== "none") {
+            matchDetailsHeight();
+          }
+        });
+
+        // Auto-select first cell on page load
+        if (clickableCells.length > 0) {
+          const firstCell = clickableCells[0];
+          const agent = firstCell.getAttribute("data-agent");
+          const seed = firstCell.getAttribute("data-seed");
+          console.log("Auto-loading first cell:", { agent, seed });
+          loadTurnHistory(agent, seed, firstCell);
+        }
+      });
+    </script>
+  </body>
 </html>
