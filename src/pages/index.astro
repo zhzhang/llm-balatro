@@ -53,6 +53,30 @@ for (const run of runMetadata) {
         gap: 1rem;
       }
 
+      /* Example state layout - grid ensures JSON panel matches screenshot height */
+      .example-state-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 36rem);
+        gap: 1rem;
+      }
+
+      .state-json-panel {
+        position: relative;
+        min-height: 0;
+      }
+
+      .state-json-content {
+        position: absolute;
+        inset: 0;
+        overflow-y: auto;
+        overflow-x: auto;
+        padding: 1rem;
+        background-color: var(--color-bg-secondary);
+        border-radius: 0.5rem;
+        margin: 0;
+        white-space: pre;
+      }
+
       .reasoning-panel {
         position: relative;
         min-height: 0;
@@ -161,6 +185,21 @@ for (const run of runMetadata) {
         .term-popover::after {
           max-width: 200px !important;
           font-size: 0.8rem !important;
+        }
+
+        .example-state-layout {
+          grid-template-columns: 1fr !important;
+        }
+
+        .state-json-panel {
+          position: relative !important;
+          height: auto !important;
+          max-height: 300px !important;
+        }
+
+        .state-json-content {
+          position: relative !important;
+          inset: auto !important;
         }
       }
     </style>
@@ -284,26 +323,53 @@ for (const run of runMetadata) {
           </div>
         </div>
 
-        <p>Balatro is an interesting test bed for LLM reasoning:</p>
+        <p>Balatro is an interesting test bed for LLM reasoning because:</p>
         <ul>
           <li>
-            The game is stochastic with an enormous branching factor, requiring
+            It is stochastic with an enormous branching factor, requiring
             probabilistic reasoning to make optimal decisions.
           </li>
           <li>
-            Long sequences of planning and execution are needed to keep up with
+            Long range planning and execution are needed to curate strong enough combos and decks that can keep up with
             the exponentially increasing chip requirement.
           </li>
-          <li>Being turn-based, the game is completely playable in text form.</li>
+          <li>Being turn-based, with no real-time or visuospatial qualities, the game is completely playable in text form.</li>
         </ul>
 
+		<div
+          class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-4"
+          style="border-color: var(--color-border-light);"
+        >
+          <p class="text-sm mb-4" style="color: var(--color-text-secondary);">
+            An example game state and corresponding screenshot from Ante 7:
+          </p>
+          <div class="example-state-layout">
+            <div class="state-json-panel">
+              <pre
+                class="state-json-content text-xs leading-relaxed"
+                style="color: var(--color-text-secondary);"
+              >{JSON.stringify(JSON.parse(JSON.parse((await readFile(join(process.cwd(), "public", "turn-history", "openai", "422J6NUH", "170.json"), "utf-8"))).state).game_state, null, 2)}</pre>
+            </div>
+            <div>
+              <img
+                src="/turn-history/openai/422J6NUH/170.png"
+                alt="Ante 7 game state screenshot"
+                class="w-full h-auto border rounded"
+                style="border-color: var(--color-border-light);"
+              />
+            </div>
+          </div>
+        </div>
+
         <p>
-			As I was interested in the agents' decision making abilities, and not their ability to click around the game's UI,
-			I elected to mod the game to stringify the state as JSON, rather than giving agents screenshots.
+			As I was interested in the agents' decision making abilities, and not their ability to navigate and click around the game's UI to do things,
+			I elected to mod the game to stringify the state as JSON, rather than working with the agents through screenshots. Parts
+			of the mod code are available in the <a href="https://github.com/zhzhang/llm-balatro/tree/main/experiment-code" target="_blank" rel="noopener noreferrer">experiment-code</a> repository for your reference,
+			though I have not had a chance to formally turn it into a <a href="https://github.com/Steamodded/smods" target="_blank" rel="noopener noreferrer">Steamodded</a> mod.
         </p>
 
         <p>
-          I ran had models from OpenAI, Claude, and Google each play 10 games
+          I had models from OpenAI, Claude, and Google each play 10 games
           using the same set of run seeds. I used the maximum thinking effort
           setting for each model. I also include the average cost per turn for
           each model. Here are the results:
