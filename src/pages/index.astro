@@ -225,13 +225,13 @@ for (const run of runMetadata) {
       <article class="leading-[1.8]">
         <p>
           <strong>Balatro</strong> is a <span
-            class="relative underline decoration-dotted cursor-help"
+            class="term-popover relative underline decoration-dotted cursor-help"
             style="text-decoration-color: var(--color-accent); color: inherit;"
             data-definition="A game genre where progress is procedurally generated, features permanent death, and requires players to restart from the beginning when they die."
             >roguelike</span
           >
           <span
-            class="relative underline decoration-dotted cursor-help"
+            class="term-popover relative underline decoration-dotted cursor-help"
             style="text-decoration-color: var(--color-accent); color: inherit;"
             data-definition="A game genre where players build and customize a deck of cards throughout the game, making strategic choices about which cards to add, remove, or upgrade."
             >deckbuilder</span
@@ -306,14 +306,12 @@ for (const run of runMetadata) {
           I ran had models from OpenAI, Claude, and Google each play 10 games
           using the same set of run seeds. I used the maximum thinking effort
           setting for each model. I also include the average cost per turn for
-          each model.
+          each model. Here are the results:
         </p>
-        <p class="mb-4" style="color: var(--color-text-secondary);">
-          Click any cell in the table below to view the turn-by-turn history of
-          that run.
-        </p>
+
         <div
-          class="table-container my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2"
+          class="table-container my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-4"
+          style="border-color: var(--color-border-light);"
         >
           <table class="outcomes-table w-full border-collapse text-sm">
             <thead>
@@ -596,8 +594,8 @@ for (const run of runMetadata) {
               </tr>
             </tbody>
           </table>
-		  <p>
-			Select a run from the table above to view the turn-by-turn history below.
+        	<p class="mb-4" style="color: var(--color-text-secondary);">
+			Select a run from the table above to view the turn-by-turn history and agent reasoning of that run.
 		  </p>
           <div id="turn-browser" class="max-w-full">
             <div class="turn-browser-layout">
@@ -684,7 +682,7 @@ for (const run of runMetadata) {
         At the end of the day, the Bitter Lesson is that this AI race is about
         scaling compute and data, and teams that have access to more and better
         of both will win. This experiment has woken me up to how unfair of an
-        advantage Youtube is in the AI race, let alone Gmail, Gsuite, and maps. The sheer amount of high fidelity
+        advantage Youtube is in the AI race. The sheer amount of high fidelity
         multi-modal explanations of pretty much any topic you can imagine
         creates a data moat that companies starting from scraping the internet
         struggle to match. If you have the right data for a specific domain, you
