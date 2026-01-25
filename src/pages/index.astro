@@ -62,6 +62,40 @@ for (const run of runMetadata) {
 			line-height: 1.8;
 		}
 		
+		.gifs-container {
+			margin: 2rem 0;
+			width: calc(100vw - 4rem);
+			max-width: 1400px;
+			position: relative;
+			left: 50%;
+			transform: translateX(-50%);
+			display: flex;
+			gap: 1.5rem;
+			justify-content: center;
+			align-items: flex-start;
+		}
+		
+		.gif-item {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		
+		.gif-item img {
+			width: 100%;
+			height: auto;
+			border-radius: 8px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+		
+		.gif-caption {
+			margin-top: 0.75rem;
+			font-size: 0.85rem;
+			color: var(--text-secondary);
+			text-align: center;
+		}
+		
 		.table-container {
 			margin: 2rem 0;
 			width: calc(100vw - 4rem);
@@ -408,9 +442,24 @@ for (const run of runMetadata) {
 			<article class="article-content">
 				<p>
 					<strong>Balatro</strong> is a <span class="term-popover" data-definition="A game genre where progress is procedurally generated, features permanent death, and requires players to restart from the beginning when they die.">roguelike</span> <span class="term-popover" data-definition="A game genre where players build and customize a deck of cards throughout the game, making strategic choices about which cards to add, remove, or upgrade.">deckbuilder</span> based on poker that was released in 2024.
-					Players play poker hands to earn chips and pass rounds, trying to pass an exponentially increasing chip requirement as rounds progress.
-					To keep up, players can gain power by buying Jokers and deck-modifying power ups that stack the deck in their favor.
+					Players play poker hands to earn chips and pass rounds, trying to exceed exponentially increasing chip requirement as rounds progress.
 				</p>
+
+				<div class="gifs-container">
+					<div class="gif-item">
+						<img src="/gifs/balatro-1.gif" alt="Balatro gameplay 1" />
+						<p class="gif-caption">1. Start playing regular poker hands to earn money.</p>
+					</div>
+					<div class="gif-item">
+						<img src="/gifs/balatro-2.gif" alt="Balatro gameplay 2" />
+						<p class="gif-caption">2. Buy and use power ups to stack the deck in your favor.</p>
+					</div>
+					<div class="gif-item">
+						<img src="/gifs/balatro-3.gif" alt="Balatro gameplay 3" />
+						<p class="gif-caption">3. Build OP combos and win the game.</p>
+					</div>
+				</div>
+
 				<p>
 					Balatro is an interesting test bed for LLM reasoning:
 				</p>
@@ -440,6 +489,7 @@ for (const run of runMetadata) {
 						<thead>
 							<tr>
 								<th>Seed</th>
+								<th>Cost per turn</th>
 								<th>22V4E3UE</th>
 								<th>2JW2IH4X</th>
 								<th>422J6NUH</th>
@@ -455,6 +505,7 @@ for (const run of runMetadata) {
 						<tbody>
 							<tr>
 								<th>claude-4.5-sonnet</th>
+								<td>$0.058</td>
 								<td class="lost">Ante 6</td>
 								<td class="lost">Ante 6</td>
 								<td class="lost">Ante 5</td>
@@ -468,6 +519,7 @@ for (const run of runMetadata) {
 							</tr>
 							<tr>
 								<th>gpt-5.2</th>
+								<td>$0.034</td>
 								<td class="lost">Ante 5</td>
 								<td class="lost">Ante 5</td>
 								<td class="lost">Ante 7</td>
@@ -481,6 +533,7 @@ for (const run of runMetadata) {
 							</tr>
 							<tr>
 								<th>gemini-3-flash</th>
+								<td>$0.008</td>
 								<td class="won">WON</td>
 								<td class="won">WON</td>
 								<td class="won">WON</td>
