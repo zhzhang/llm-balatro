@@ -6,9 +6,15 @@ import { defineConfig } from 'astro/config';
 
 import db from '@astrojs/db';
 
+import tailwindcss from '@tailwindcss/vite';
+
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://example.com',
-    output: 'server',
-    integrations: [mdx(), sitemap(), db()],
+  site: 'https://example.com',
+  output: 'server',
+  integrations: [mdx(), sitemap(), db()],
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });
