@@ -232,7 +232,7 @@ for (const run of runMetadata) {
 
 		.turn-display {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: 60% 40%;
 			gap: 1rem;
 		}
 
@@ -252,18 +252,22 @@ for (const run of runMetadata) {
 			height: auto;
 			border: 1px solid var(--border-light);
 			border-radius: 4px;
+			display: block;
 		}
 
 		.turn-details {
-			display: flex;
-			flex-direction: column;
-			gap: 1rem;
-		}
-
-		.detail-section {
 			background-color: white;
 			padding: 1rem;
 			border-radius: 4px;
+			overflow-y: auto;
+		}
+
+		.detail-section {
+			margin-bottom: 1.5rem;
+		}
+
+		.detail-section:last-child {
+			margin-bottom: 0;
 		}
 
 		.detail-section h3 {
@@ -394,6 +398,11 @@ for (const run of runMetadata) {
 
 			.turn-display {
 				grid-template-columns: 1fr;
+			}
+
+			.turn-details {
+				height: auto !important;
+				max-height: 500px;
 			}
 
 			.turn-controls {
@@ -556,7 +565,6 @@ for (const run of runMetadata) {
 				</div>
 
 				<div class="turn-history-section" id="turn-history-section">
-					<h2 id="turn-history-title">Turn History</h2>
 					<p id="turn-history-instructions" style="color: var(--text-secondary); margin-bottom: 1rem;">Click any cell in the table above to view the turn-by-turn history of that run.</p>
 
 					<div id="turn-browser" class="turn-browser" style="display: none;">
@@ -573,10 +581,12 @@ for (const run of runMetadata) {
 
 							<div class="turn-details">
 								<div class="detail-section">
+									<h3>Action</h3>
 									<pre id="action-text" class="code-block"></pre>
 								</div>
 
 								<div class="detail-section">
+									<h3>Reasoning</h3>
 									<pre id="reasoning-text" class="code-block"></pre>
 								</div>
 							</div>
@@ -640,7 +650,6 @@ for (const run of runMetadata) {
 				let selectedCell = null;
 
 				const turnHistorySection = document.getElementById('turn-history-section');
-				const turnHistoryTitle = document.getElementById('turn-history-title');
 				const turnHistoryInstructions = document.getElementById('turn-history-instructions');
 				const turnBrowser = document.getElementById('turn-browser');
 				const loadingMessage = document.getElementById('loading-message');
@@ -648,8 +657,18 @@ for (const run of runMetadata) {
 				const nextButton = document.getElementById('next-turn');
 				const turnCounter = document.getElementById('turn-counter');
 				const screenshotImg = document.getElementById('screenshot-img');
+				const screenshotContainer = document.querySelector('.turn-screenshot');
+				const turnDetails = document.querySelector('.turn-details');
 				const actionText = document.getElementById('action-text');
 				const reasoningText = document.getElementById('reasoning-text');
+
+				// Function to match turn-details height to screenshot container
+				function matchDetailsHeight() {
+					if (screenshotContainer && turnDetails) {
+						const height = screenshotContainer.offsetHeight;
+						turnDetails.style.height = height + 'px';
+					}
+				}
 
 				async function loadTurnHistory(agent, seed, clickedCell) {
 					if (!agent || !seed) {
@@ -688,9 +707,6 @@ for (const run of runMetadata) {
 							return;
 						}
 
-						// Update title to show what's being displayed
-						turnHistoryTitle.textContent = `Turn History: ${agent} on seed ${seed}`;
-
 						// Show browser and display first turn
 						loadingMessage.style.display = 'none';
 						turnBrowser.style.display = 'block';
@@ -725,6 +741,11 @@ for (const run of runMetadata) {
 						if (turnData.hasScreenshot) {
 							screenshotImg.src = `/turn-history/${currentAgent}/${currentSeed}/${turnNumber}.png`;
 							screenshotImg.style.display = 'block';
+							
+							// Match heights when image loads
+							screenshotImg.onload = () => {
+								matchDetailsHeight();
+							};
 						} else {
 							screenshotImg.style.display = 'none';
 						}
@@ -734,6 +755,9 @@ for (const run of runMetadata) {
 
 						// Update reasoning text
 						reasoningText.textContent = turnData.reasoning || 'No reasoning data available';
+
+						// Match heights in case image is cached
+						setTimeout(matchDetailsHeight, 100);
 
 						// Update button states
 						const isPrevDisabled = currentTurnIndex === 0;
@@ -790,6 +814,22 @@ for (const run of runMetadata) {
 						goToNextTurn();
 					}
 				});
+
+				// Window resize handler
+				window.addEventListener('resize', () => {
+					if (turnBrowser.style.display !== 'none') {
+						matchDetailsHeight();
+					}
+				});
+
+				// Auto-select first cell on page load
+				if (clickableCells.length > 0) {
+					const firstCell = clickableCells[0];
+					const agent = firstCell.getAttribute('data-agent');
+					const seed = firstCell.getAttribute('data-seed');
+					console.log('Auto-loading first cell:', { agent, seed });
+					loadTurnHistory(agent, seed, firstCell);
+				}
 			});
 		</script>
 	</body>
