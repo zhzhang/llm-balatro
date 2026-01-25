@@ -288,14 +288,13 @@ for (const run of runMetadata) {
 					<p id="turn-history-instructions" class="mb-4" style="color: var(--color-text-secondary);">Click any cell in the table above to view the turn-by-turn history of that run.</p>
 
 					<div id="turn-browser" class="mt-4" style="display: none;">
-						<div class="turn-controls grid grid-cols-[1fr_auto_1fr] gap-4 items-center mb-4 p-3 bg-white rounded">
-							<button id="prev-turn" disabled class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-start hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600">← Previous Turn</button>
-							<span id="turn-counter" class="font-semibold text-lg text-center whitespace-nowrap">Turn 0 / 0</span>
-							<button id="next-turn" disabled class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-end hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600">Next Turn →</button>
-						</div>
-
 						<div class="turn-display grid grid-cols-[60%_40%] gap-4">
 							<div class="bg-white p-4 rounded">
+								<div class="turn-controls grid grid-cols-[1fr_auto_1fr] gap-4 items-center mb-4">
+									<button id="prev-turn" disabled class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-start hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600">← Previous Turn</button>
+									<span id="turn-counter" class="font-semibold text-lg text-center whitespace-nowrap">Turn 0 / 0</span>
+									<button id="next-turn" disabled class="py-3 px-6 bg-blue-600 text-white border-2 border-transparent rounded cursor-pointer text-base transition-all duration-200 shrink-0 min-w-[150px] font-medium justify-self-end hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed disabled:border-gray-600">Next Turn →</button>
+								</div>
 								<img id="screenshot-img" alt="Game state screenshot" class="w-full h-auto border rounded block" style="border-color: var(--color-border-light);" />
 							</div>
 
