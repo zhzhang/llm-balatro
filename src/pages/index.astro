@@ -835,12 +835,18 @@ for (const run of runMetadata) {
 	  <ul>
 		<li>Knew instinctively to try and beat round with as few hands as possible to earn an extra $1 per hand, averaging 1.59 hands played per round vs 2.07 for claude and 2.08 for gpt.
 			This is despite the hand payout being part of the system prompt.
-			For example, it opted to discard and redraw two low diamond cards <a
+			For example, it <a
           href="#turn-browser"
           onclick="selectRunAndTurn('gemini', '22V4E3UE', 4); return false;"
           class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
           style="color: var(--color-accent);"
-        >here</a> in order to try and pass the round with a single hand.
+        >opted to discard and redraw two low diamond cards</a> in order to try and pass the round with a single hand, whereas claude
+		<a
+          href="#turn-browser"
+          onclick="selectRunAndTurn('claude', 'M8KADSBQ', 5); return false;"
+          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+          style="color: var(--color-accent);"
+        >slams the flush with a discard left over</a> in a similar situation.
 		</li>
 		<li>
 			Discarded more aggressively than the other two models, which is consistent with the goal of trying to pass the round with a single hand.
