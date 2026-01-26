@@ -390,6 +390,9 @@ for (const run of runMetadata) {
 		<li>
 			In addition to the current state, I also provided the state, action taken, and agent's reasoning for the last 3 turns, to help maintain some tactical continuity across turns. 
 		</li>
+		<li>
+			All games were played on White Stake (base/easiest difficulty) and Red Deck (first deck available in the game).
+		</li>
 		</ul>
 		<p>
 		  Here are the results, including the average cost per turn for each model:
@@ -746,24 +749,36 @@ for (const run of runMetadata) {
           </div>
         </div>
       </article>
+	  <h2 class="text-2xl font-semibold mb-4">An unexpected outcome</h2>
       <p>
         Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
         despite the latter two being bigger and more expensive. I originally planned
 		comparisons all of the same "default" model size for each company, but during testing,
-		gemini-3-flash as winning games so reliably that I decided to save some money and continue
+		gemini-3-flash was winning games so reliably that I decided to save some money and continue
 		running with it.
       </p>
 	  
 	  <p>
-		What tipped me off to what was happening was turn 9 of the gemini run on seed 5U4K91D8.
-		In its reasoning, gemini mentions offhandedly that the Blank Voucher, although it says "Does nothing?" in the description,
-		actually unlocks the Antimatter Voucher for the run, which allows the player to have an extra joker slot.
+		What tipped me off to what was happening was <a
+          href="#turn-browser"
+          onclick="selectRunAndTurn('gemini', '5U4K91D8', 9); return false;"
+          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+          style="color: var(--color-accent);"
+        >turn 9 of the gemini run on seed 5U4K91D8</a>.
+		In its reasoning, gemini mentions offhandedly that the Blank Voucher, although it says "Does nothing?" as the textual description of its effect
+		 (which is what the agent sees), actually unlocks the Antimatter Voucher for later purchase in the run, which allows the player to have an extra joker slot.
 		The thing is <em>none of this information is in the system prompt or the state passed to the model</em>.
 	  </p>
 
 	  <p>
 		Scrolling through the turn-by-turn history of gemini runs, it became clear that gemini simply <em>knew more</em> about the game
-		than the other two models.
+		than the other two models. As a result, it:
+	  </p>
+	  <ul>
+		<li>Knew instinctively to try and beat round with as few hands as possible, averaging 1.59 hands played per round vs 2.07 for claude and 2.08 for gpt.</li>
+	  </ul>
+	  <p>
+		Because these are idiosyncrasies of Balatro but not poker, the other two models had to rely on sheer comprehension and reasoning to play the game.
 	  </p>
 
       <p>
@@ -885,6 +900,37 @@ for (const run of runMetadata) {
 
         updateTurnDisplay();
       }
+
+      // Select a run and navigate to a specific turn (1-indexed)
+      function selectRunAndTurn(agent, seed, turnNumber) {
+        const run = findRun(agent, seed);
+        if (!run) return;
+
+        // Update selection state
+        currentAgent = agent;
+        currentSeed = seed;
+        currentTurns = run.turns;
+        currentTurnIndex = Math.min(turnNumber - 1, currentTurns.length - 1);
+
+        // Clear previous selection
+        document
+          .querySelectorAll("td.selected")
+          .forEach((td) => td.classList.remove("selected"));
+
+        // Highlight selected cell
+        const cell = document.querySelector(
+          `td[data-agent="${agent}"][data-seed="${seed}"]`,
+        );
+        if (cell) cell.classList.add("selected");
+
+        updateTurnDisplay();
+
+        // Scroll the turn browser into view
+        document.getElementById("turn-browser").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // Make selectRunAndTurn available globally for inline onclick handlers
+      window.selectRunAndTurn = selectRunAndTurn;
 
       // Navigation handlers
       prevBtn.addEventListener("click", () => {
