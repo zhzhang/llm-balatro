@@ -380,6 +380,10 @@ for (const run of runMetadata) {
 			The maximum thinking effort setting for each model was used.
 		</li>
 		<li>
+			I gave a system prompt that explained the general rules and flow of the game, which can be viewed <a href="https://github.com/zhzhang/llm-balatro/blob/main/experiment-code/prompts.py#L88" target="_blank" rel="noopener noreferrer">here</a>.
+			The system prompt does not provide any information on specific instances of game objects like jokers, cards, consumable, or bosses, and does not give any strategies for playing the game.
+		</li>
+		<li>
 			Because the rules for scoring hands can involve very long sequences of cards triggering compounding special effects, I help the agent gauge the amount of chips it might earn by playing a hand by providing a history of the last 7 hands played.
 			This backwards looking memory of recent hands played is similar in feeling to how a human player gauges how "strong" any given played hand might be.
 		</li>
@@ -744,8 +748,23 @@ for (const run of runMetadata) {
       </article>
       <p>
         Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
-        despite the latter being bigger and more expensive.
+        despite the latter two being bigger and more expensive. I originally planned
+		comparisons all of the same "default" model size for each company, but during testing,
+		gemini-3-flash as winning games so reliably that I decided to save some money and continue
+		running with it.
       </p>
+	  
+	  <p>
+		What tipped me off to what was happening was turn 9 of the gemini run on seed 5U4K91D8.
+		In its reasoning, gemini mentions offhandedly that the Blank Voucher, although it says "Does nothing?" in the description,
+		actually unlocks the Antimatter Voucher for the run, which allows the player to have an extra joker slot.
+		The thing is <em>none of this information is in the system prompt or the state passed to the model</em>.
+	  </p>
+
+	  <p>
+		Scrolling through the turn-by-turn history of gemini runs, it became clear that gemini simply <em>knew more</em> about the game
+		than the other two models.
+	  </p>
 
       <p>
         The reason for this gap, Google's secret weapon in the current AI race:
