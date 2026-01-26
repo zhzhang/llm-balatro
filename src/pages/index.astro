@@ -71,23 +71,21 @@ for (const run of runMetadata) {
       }
 
       .turn-slider::-webkit-slider-thumb:hover {
-        transform: scale(1.15);
         background: var(--color-accent-hover);
       }
 
       .turn-slider::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
+        width: 6px;
+        height: 14px;
+        border-radius: 3px;
         background: var(--color-accent);
         cursor: pointer;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        transition: transform 0.15s ease;
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        transition: background 0.15s ease;
       }
 
       .turn-slider::-moz-range-thumb:hover {
-        transform: scale(1.15);
         background: var(--color-accent-hover);
       }
 
@@ -744,7 +742,7 @@ for (const run of runMetadata) {
                   <div class="flex items-center gap-3">
                     <button
                       id="prev-turn-btn"
-                      class="w-10 h-10 rounded-full font-bold text-lg transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                      class="px-2 h-5 rounded text-xs transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
                       style="background-color: var(--color-accent); color: white; border: none;"
                       disabled
                       title="Previous turn (←)"
@@ -761,7 +759,7 @@ for (const run of runMetadata) {
                     />
                     <button
                       id="next-turn-btn"
-                      class="w-10 h-10 rounded-full font-bold text-lg transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                      class="px-2 h-5 rounded text-xs transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
                       style="background-color: var(--color-accent); color: white; border: none;"
                       disabled
                       title="Next turn (→)"
@@ -861,7 +859,7 @@ for (const run of runMetadata) {
 		</li>
 	  </ul>
 	  <p>
-		Because these are idiosyncrasies of Balatro but not poker, the other two models had to rely on sheer comprehension and reasoning to play the game.
+		Because these are idiosyncrasies of Balatro but not poker, the other two models had to rely on sheer comprehension and reasoning to play the game, and to an extent had to forget their knowledge of poker that was being induced by the overall vocabulary of the game, to perform effectively.
 	  </p>
 
 	  <h2 class="text-2xl font-semibold mb-4">Why Google is going to win the AI race</h2>
