@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 *.db
 *.bak
+
+# Local Netlify folder
+.netlify
