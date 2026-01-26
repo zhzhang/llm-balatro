@@ -382,7 +382,7 @@ for (const run of runMetadata) {
             Long range planning and execution are needed to curate strong enough combos and decks that can keep up with
             the exponentially increasing chip requirement.
           </li>
-          <li>Being turn-based, with no real-time or visuospatial qualities, the game is completely playable in text form.</li>
+          <li>Being turn-based, with no real-time or visuospatial qualities, the game is playable entirely in text form.</li>
         </ul>
 
 		<div
@@ -922,6 +922,15 @@ for (const run of runMetadata) {
       const nextBtn = document.getElementById("next-turn-btn");
       const turnSlider = document.getElementById("turn-slider");
 
+      // Debounce utility
+      function debounce(fn, delay) {
+        let timeoutId;
+        return function (...args) {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
+      }
+
       // Find run metadata by agent and seed
       function findRun(agent, seed) {
         return runMetadata.find((r) => r.agent === agent && r.seed === seed);
@@ -1041,10 +1050,18 @@ for (const run of runMetadata) {
         }
       });
 
-      // Slider navigation
+      // Slider navigation (debounced to reduce fetches)
+      const debouncedUpdateTurnDisplay = debounce(updateTurnDisplay, 150);
       turnSlider.addEventListener("input", () => {
         currentTurnIndex = parseInt(turnSlider.value, 10);
-        updateTurnDisplay();
+        // Update only the turn indicator immediately for responsiveness
+        if (currentTurns.length > 0) {
+          turnIndicator.textContent = `Turn ${currentTurnIndex + 1} of ${currentTurns.length}`;
+          prevBtn.disabled = currentTurnIndex === 0;
+          nextBtn.disabled = currentTurnIndex === currentTurns.length - 1;
+        }
+        // Debounce the image and JSON fetch
+        debouncedUpdateTurnDisplay();
       });
 
       // Keyboard navigation
