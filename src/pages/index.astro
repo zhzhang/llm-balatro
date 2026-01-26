@@ -433,14 +433,14 @@ for (const run of runMetadata) {
 			The system prompt does not provide any information on specific instances of game objects like jokers, cards, consumable, or bosses, and does not give any strategies for playing the game.
 		</li>
 		<li>
-			Because the rules for scoring hands can involve very long sequences of cards triggering compounding special effects, I help the agent gauge the amount of chips it might earn by playing a hand by providing a history of the last 7 hands played.
-			This backwards looking memory of recent hands played is similar in feeling to how a human player gauges how "strong" any given played hand might be.
+			Because the rules for scoring hands can involve very long sequences of cards triggering compounding special effects, I helped the agent gauge the amount of chips it might earn by playing a hand by providing a history of the last 7 hands played.
+			This backwards looking memory of recent hands played is similar in feeling to how a human player gauges how "strong" their next played hand might be.
 		</li>
 		<li>
 			In addition to the current state, I also provided the state, action taken, and agent's reasoning for the last 3 turns, to help maintain some tactical continuity across turns. 
 		</li>
 		<li>
-			All games were played on White Stake (base/easiest difficulty) and Red Deck (first deck available in the game).
+			All games were played on White Stake (base/easiest difficulty) and Red Deck (first deck available in the game). Not the biggest challenge in the world, I know.
 		</li>
 		</ul>
 		<p>
@@ -780,7 +780,7 @@ for (const run of runMetadata) {
                   alt="Game state screenshot"
                   class="w-full h-auto border rounded block"
                   style="border-color: var(--color-border-light);"
-                  src="/turn-history/gemini/84N5GIYF/0.png"
+                  src="/turn-history/claude/22V4E3UE/0.png"
                 />
               </div>
               <div class="reasoning-panel">
@@ -810,19 +810,21 @@ for (const run of runMetadata) {
 	  <h2 class="text-2xl font-semibold mb-4">An unexpected outcome</h2>
       <p>
         Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
-        despite the latter two being bigger and more expensive. I originally planned
-		comparisons all of the same "default" model size for each company, but during testing,
-		gemini-3-flash was winning games so reliably that I decided to save some money and continue
-		running with it.
+        despite the latter two being bigger and more expensive. I originally planned to 
+		compare the "default" model tier for each company, and given that I started with Claude,
+		was even in the process of implementing <a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener noreferrer">Reflexion</a>
+	, <a href="https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/" target="_blank" rel="noopener noreferrer">AlphaEvolve</a>
+	and <a href="https://voyager.minedojo.org/" target="_blank" rel="noopener noreferrer">Voyager</a>-inspired approaches to help the agent develop for itself a set of useful gameplay policies.
+		However, when by chance I swapped to gemini-3-flash just for a point of comparison, seeing that that it crushed its first run while claude-4.5-sonnet was struggling to reliably get to Ante 7, the direction of the project changed completely.
       </p>
 	  
 	  <p>
-		What tipped me off to what was happening was <a
+		<a
           href="#turn-browser"
           onclick="selectRunAndTurn('gemini', '5U4K91D8', 9); return false;"
           class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
           style="color: var(--color-accent);"
-        >turn 9 of the gemini run on seed 5U4K91D8</a>.
+        >Turn 9 of the gemini run on seed 5U4K91D8</a> is what tipped me off to what was happening.
 		In its reasoning, gemini mentions offhandedly that the Blank Voucher, although it says "Does nothing?" as the textual description of its effect
 		 (which is what the agent sees), actually unlocks the Antimatter Voucher for later purchase in the run, which allows the player to have an extra joker slot.
 		The thing is <em>none of this information is in the system prompt or the state passed to the model</em>.
@@ -830,10 +832,11 @@ for (const run of runMetadata) {
 
 	  <p>
 		Scrolling through the turn-by-turn history of gemini runs, it becomes clear that gemini simply <em>knew more</em> about the game
-		than the other two models. As a result, it:
+		than the other two models. As a result, it also had some gameplay habits that could technically be arrived at by reasoning alone,
+		but the other models could not reliably replicate. It:
 	  </p>
 	  <ul>
-		<li>Knew instinctively to try and beat round with as few hands as possible to earn an extra $1 per hand, averaging 1.59 hands played per round vs 2.07 for claude and 2.08 for gpt.
+		<li>Knew instinctively to try and beat rounds with as few hands as possible to earn an extra $1 per hand, averaging 1.59 hands played per round vs 2.07 for claude and 2.08 for gpt.
 			This is despite the hand payout being part of the system prompt.
 			For example, it <a
           href="#turn-browser"
@@ -849,19 +852,23 @@ for (const run of runMetadata) {
         >slams the flush with a discard left over</a> in a similar situation.
 		</li>
 		<li>
-			Discarded more aggressively than the other two models, which is consistent with the goal of trying to pass the round with a single hand.
+			Discarded more aggressively, and <em>remembered</em> that it <em>could</em> discard more often than the other two models, which is consistent with the goal of trying to pass the round with a single hand.
 			Claude often 
 			<a
           href="#turn-browser"
           onclick="selectRunAndTurn('claude', 'M3F6LPGY', 28); return false;"
           class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
           style="color: var(--color-accent);"
-        >forgot it could discard</a> and redraw cards to shape its hand.
+        >forgot it could discard</a> and redraw cards to shape its hand, and lost at avoidable times with resources left to spend.
 		</li>
 		<li>
 			Maintained 2-3x as much money in reserve on average, $22.71, compared to $9.25 for claude and $7.70 for gpt.
 			This is because money in reserve earns $1 of interest per $5 held upon winning a round, up to a maximum of $25 ($5 of interest), something that was noted in the system prompt.
-			Gemini maintains about as much money in reserve as the maximum interest gain, thereby maximizing its economy and optionality in shops.
+			Gemini maintains about as much money in reserve as the maximum interest gain allows, thereby maximizing its economy and optionality in shops.
+		</li>
+		<li>
+			Understood that it could (and should) make modifications to the deck itself with tarot cards. By the end of the 422J6NUH run, it had a deck composed
+			nearly entirely of clubs cards, while the other agents typically didn't understand how to slowly change their deck composition over time.
 		</li>
 	  </ul>
 	  <p>
@@ -870,28 +877,45 @@ for (const run of runMetadata) {
 
 	  <h2 class="text-2xl font-semibold mb-4">Why Google is going to win the AI race</h2>
       <p>
-        The reason for this gap, Google's secret weapon in the current AI race:
-        Youtube. When I originally started the agent development with Claude,
-        performance was poor, and I looked for a textual guide to see if I could
-        hand the manual strategy for success. (I also tried briefly implementing
-        Reflexion, as well as an AlphaEvolve-based evolutionary algorithm) Good,
-        comprehensive text-based guides were very hard to find, but Youtube had
-        tons of content from streamers, breaking down strategies and gameplay.
-        When watching gemini play, I noticed within the first couple of Antes
-        that it knew more about the game than the other two models, certainly
-        more than was possible from the state context I was giving it.
+		Given how big the performance gap is, and the clues that point to the fact that it is knowledge based, not reasoning based,
+		the source of the gap must be the pretraining data mix, and Google has a massive advantage in this regard.
+	  </p>
+	  <p>
+        When I originally started the agent development, I searched for a textual guide (i.e. on Reddit) to see if I could get Claude to win if I gave it a manually written strategy.
+		While these were hard to find, Youtube content was abundant, probably outnumbering written content for Balatro by at least 10x.
+		</p>
+	<p>
+		And not just for Balatro, the sheer amount of high fidelity
+        multi-modal content on pretty much any topic you can imagine
+        creates a data moat that companies starting from scraping the internet
+        struggle to match.
+		This is let alone the user-action data emitted by the rest of Google's portfolio as well, from Gmail to Gsuite to Maps to the search engine itself.
+		Among the major foundation model companies, Google alone (since Microsoft is not in this race) has products in which its existing users live, work, <em>and</em> play, all of which generate training data for Google.
       </p>
 
       <p>
-        At the end of the day, the Bitter Lesson is that this AI race is about
-        scaling compute and data, and teams that have access to more and better
-        of both will win. This experiment has woken me up to how unfair of an
-        advantage Youtube is in the AI race. The sheer amount of high fidelity
-        multi-modal explanations of pretty much any topic you can imagine
-        creates a data moat that companies starting from scraping the internet
-        struggle to match. If you have the right data for a specific domain, you
-        can create outsize impact for 10x cheaper.
+		If you have the right data for a specific domain, as this experiment shows, you can create outsize impact for 10x cheaper, and Google is just much more
+		likely to have any particular piece topic be in distribution than the other model companies.
       </p>
+	  
+	  <h2 class="text-2xl font-semibold mb-4">What's next?</h2>
+	  <p>
+	  Admittedly this initial experiment was done at the easiest difficulty setting, and with a single deck.
+	  As far as Balatro goes, we've only made it past the lobby with LLMs. There are 7 more difficulties, which add challenges like:
+	  </p>
+	  <ul>
+		<li>Reducing rewards for winning rounds</li>
+		<li>Increasing the chips needed top pass each round</li>
+		<li>Making power ups cost more, be temporary, or more interestingly, be unable to be sold, making strategy pivots more challenging.</li>
+	  </ul>
+	  <p>
+		Achieving good win rates on higher difficulties may require the Reflexion/Voyager/AlphaEvolve-style approaches that were unnecesary at base difficulty.
+	  </p>
+
+	  <p>
+		Moreover, Balatro remains an interesting test bed to study long range reasoning in LLMs, and it has an extensive community of modders who are constantly creating new game mechanics.
+		Perhaps win rates for Balatro (modded or not), or similar games played at high difficulties can become part of the typical evaluation metrics that LLMs are evaluated on!
+	  </p>
     </main>
 
     <footer
@@ -1088,10 +1112,10 @@ for (const run of runMetadata) {
         });
       });
 
-      // Initialize with first available run
-      if (runMetadata.length > 0) {
-        const firstRun = runMetadata[0];
-        selectRun(firstRun.agent, firstRun.seed);
+      // Initialize with first cell from the table
+      const firstCell = document.querySelector("td.clickable");
+      if (firstCell) {
+        selectRun(firstCell.dataset.agent, firstCell.dataset.seed);
       }
     </script>
   </body>
