@@ -771,11 +771,29 @@ for (const run of runMetadata) {
 	  </p>
 
 	  <p>
-		Scrolling through the turn-by-turn history of gemini runs, it became clear that gemini simply <em>knew more</em> about the game
+		Scrolling through the turn-by-turn history of gemini runs, it becomes clear that gemini simply <em>knew more</em> about the game
 		than the other two models. As a result, it:
 	  </p>
 	  <ul>
-		<li>Knew instinctively to try and beat round with as few hands as possible, averaging 1.59 hands played per round vs 2.07 for claude and 2.08 for gpt.</li>
+		<li>Knew instinctively to try and beat round with as few hands as possible to earn an extra $1 per hand, averaging 1.59 hands played per round vs 2.07 for claude and 2.08 for gpt.
+			This is despite the hand payout being part of the system prompt.
+			For example, it opted to discard and redraw two low diamond cards <a
+          href="#turn-browser"
+          onclick="selectRunAndTurn('gemini', '22V4E3UE', 4); return false;"
+          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+          style="color: var(--color-accent);"
+        >here</a> in order to try and pass the round with a single hand.
+		</li>
+		<li>
+			Discarded more aggressively than the other two models, which is consistent with the goal of trying to pass the round with a single hand.
+			Claude often 
+			<a
+          href="#turn-browser"
+          onclick="selectRunAndTurn('claude', 'M3F6LPGY', 28); return false;"
+          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+          style="color: var(--color-accent);"
+        >forgot it could discard</a> and redraw cards to shape its hand
+		</li>
 	  </ul>
 	  <p>
 		Because these are idiosyncrasies of Balatro but not poker, the other two models had to rely on sheer comprehension and reasoning to play the game.
