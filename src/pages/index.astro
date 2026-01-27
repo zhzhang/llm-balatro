@@ -333,7 +333,7 @@ for (const run of runMetadata) {
         >
           <div class="flex-1 flex flex-col items-center">
             <img
-              src="/balatro-agents/gifs/balatro-1.gif"
+              src="/gifs/balatro-1.gif"
               alt="Balatro gameplay 1"
               class="w-full h-auto rounded-lg shadow-md"
             />
@@ -346,7 +346,7 @@ for (const run of runMetadata) {
           </div>
           <div class="flex-1 flex flex-col items-center">
             <img
-              src="/balatro-agents/gifs/balatro-2.gif"
+              src="/gifs/balatro-2.gif"
               alt="Balatro gameplay 2"
               class="w-full h-auto rounded-lg shadow-md"
             />
@@ -359,7 +359,7 @@ for (const run of runMetadata) {
           </div>
           <div class="flex-1 flex flex-col items-center">
             <img
-              src="/balatro-agents/gifs/balatro-3.gif"
+              src="/gifs/balatro-3.gif"
               alt="Balatro gameplay 3"
               class="w-full h-auto rounded-lg shadow-md"
             />
@@ -401,7 +401,7 @@ for (const run of runMetadata) {
             </div>
             <div>
               <img
-                src="/balatro-agents/turn-history/openai/422J6NUH/170.png"
+                src="/turn-history/openai/422J6NUH/170.png"
                 alt="Ante 7 game state screenshot"
                 class="w-full h-auto border rounded"
                 style="border-color: var(--color-border-light);"
@@ -780,7 +780,7 @@ for (const run of runMetadata) {
                   alt="Game state screenshot"
                   class="w-full h-auto border rounded block"
                   style="border-color: var(--color-border-light);"
-                  src="/balatro-agents/turn-history/claude/22V4E3UE/0.png"
+                  src="/turn-history/claude/22V4E3UE/0.png"
                 />
               </div>
               <div class="reasoning-panel">
@@ -894,8 +894,8 @@ for (const run of runMetadata) {
       </p>
 
       <p>
-		The <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html" target="_blank" rel="noopener noreferrer">Bitter Lesson</a>-adjacent truth is that simply having the right data will net you better results for 10x cheaper inference regardless of how many
-		clever reasoning enhancing techniques you can come up with, and Google is just much more likely to have any particular topic be in distribution than the other model companies.
+		The <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html" target="_blank" rel="noopener noreferrer">Bitter Lesson</a>-adjacent truth, highlighted by this experiment, is that the team that has better data is going to have better results for 10x cheaper inference than 
+		the team that must make up for this gap with more clever reasoning techniques, and Google is just much more likely to have any particular topic be in distribution than the other model companies.
       </p>
 	  
 	  <h2 class="text-2xl font-semibold mb-4">What's next?</h2>
@@ -905,16 +905,17 @@ for (const run of runMetadata) {
 	  </p>
 	  <ul>
 		<li>Reducing rewards for winning rounds</li>
-		<li>Increasing the chips needed top pass each round</li>
-		<li>Making power ups cost more, be temporary, or more interestingly, be unable to be sold, making strategy pivots more challenging.</li>
+		<li>Increasing the chips needed to pass each round</li>
+		<li>Making power ups cost more, be temporary, or most interestingly, be unable to be sold, making strategy pivots more challenging.</li>
 	  </ul>
 	  <p>
 		Achieving good win rates on higher difficulties may require the Reflexion/Voyager/AlphaEvolve-style approaches that were unnecesary at base difficulty.
 	  </p>
 
 	  <p>
-		Moreover, Balatro remains an interesting test bed to study long range reasoning in LLMs, and it has an extensive community of modders who are constantly creating new game mechanics.
-		Perhaps win rates for Balatro (modded or not), or similar games played at high difficulties can become part of the typical evaluation metrics that LLMs are evaluated on!
+		Moreover, Balatro remains an interesting test bed to study long range reasoning in LLMs, and it has an extensive community of modders who are constantly creating new game mechanics
+    that are out-of-distribution even for Gemini.
+    In general, games are great tests of reasoning and long-term planning, and creating a general game-playing framework for benchmarking LLMs is a promising direction for the future.
 	  </p>
     </main>
 
@@ -973,12 +974,12 @@ for (const run of runMetadata) {
         const turn = currentTurns[currentTurnIndex];
 
         // Update screenshot
-        screenshotImg.src = `/balatro-agents/turn-history/${currentAgent}/${currentSeed}/${turn}.png`;
+        screenshotImg.src = `/turn-history/${currentAgent}/${currentSeed}/${turn}.png`;
 
         // Update reasoning and action
         try {
           const response = await fetch(
-            `/balatro-agents/turn-history/${currentAgent}/${currentSeed}/${turn}.json`,
+            `/turn-history/${currentAgent}/${currentSeed}/${turn}.json`,
           );
           const data = await response.json();
           reasoningText.textContent =
