@@ -1,0 +1,708 @@
+{
+  "hand_levels": {
+    "Two Pair": {
+      "times_played": 2,
+      "chips": 20,
+      "level": 1,
+      "mult": 2
+    },
+    "Pair": {
+      "times_played": 2,
+      "chips": 10,
+      "level": 1,
+      "mult": 2
+    },
+    "High Card": {
+      "times_played": 6,
+      "chips": 5,
+      "level": 1,
+      "mult": 1
+    },
+    "Flush Five": {
+      "times_played": 0,
+      "chips": 160,
+      "level": 1,
+      "mult": 16
+    },
+    "Flush House": {
+      "times_played": 0,
+      "chips": 140,
+      "level": 1,
+      "mult": 14
+    },
+    "Five of a Kind": {
+      "times_played": 0,
+      "chips": 120,
+      "level": 1,
+      "mult": 12
+    },
+    "Straight Flush": {
+      "times_played": 0,
+      "chips": 180,
+      "level": 3,
+      "mult": 16
+    },
+    "Four of a Kind": {
+      "times_played": 0,
+      "chips": 60,
+      "level": 1,
+      "mult": 7
+    },
+    "Full House": {
+      "times_played": 0,
+      "chips": 40,
+      "level": 1,
+      "mult": 4
+    },
+    "Flush": {
+      "times_played": 16,
+      "chips": 95,
+      "level": 5,
+      "mult": 12
+    },
+    "Straight": {
+      "times_played": 0,
+      "chips": 30,
+      "level": 1,
+      "mult": 4
+    },
+    "Three of a Kind": {
+      "times_played": 0,
+      "chips": 30,
+      "level": 1,
+      "mult": 3
+    }
+  },
+  "deck": [
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+8 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "8 of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Jack of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+7 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "7 of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+9 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "9 of Clubs",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Queen of Clubs",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+5 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "5 of Spades",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+3 chips X1.5 Mult while this card stays in hand",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "3 of Hearts",
+      "enhancement": "Steel Card"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "10 of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips +30 extra chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "10 of Diamonds",
+      "enhancement": "Bonus"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips +4 Mult",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "King of Diamonds",
+      "enhancement": "Mult"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Jack of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+3 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "3 of Spades",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+3 chips",
+      "secondary_description": "Retrigger this card 1 time",
+      "sells_for": 1,
+      "name": "3 of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+2 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "2 of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "King of Spades",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+9 chips $3 if this card is held in hand at end of round",
+      "secondary_description": "Retrigger this card 1 time",
+      "sells_for": 1,
+      "name": "9 of Diamonds",
+      "enhancement": "Gold Card"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+5 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "5 of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Jack of Spades",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+8 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "8 of Spades",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+3 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "3 of Clubs",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+11 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Ace of Spades",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+9 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "9 of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "King of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+9 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "9 of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+6 chips X1.5 Mult while this card stays in hand",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "6 of Hearts",
+      "enhancement": "Steel Card"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+6 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "6 of Spades",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+8 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "8 of Clubs",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+3 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "3 of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+10 chips X1.5 Mult while this card stays in hand",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Jack of Diamonds",
+      "enhancement": "Steel Card"
+    },
+    {
+      "facing": "back",
+      "cost": 1,
+      "type": "deck",
+      "main_description": "+5 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "5 of Hearts",
+      "enhancement": "Default Base"
+    }
+  ],
+  "owned_vouchers": [
+    "v_magic_trick",
+    "v_blank",
+    "v_overstock_norm",
+    "v_wasteful"
+  ],
+  "max_consumeables": 2,
+  "round_number": 13,
+  "state": "SELECTING_HAND",
+  "tags": [],
+  "blind_info": {
+    "Boss": {
+      "state": "Current",
+      "chips_needed": 70000,
+      "reward": 5,
+      "boss_description": "First hand is drawn face down"
+    },
+    "Small": {
+      "tag": "Top-up Tag",
+      "tag_description": "Create up to 2 Common Jokers (Must have room)",
+      "chips_needed": 35000,
+      "reward": 3,
+      "state": "Defeated"
+    },
+    "Big": {
+      "tag": "Ethereal Tag",
+      "tag_description": "Gives a free Spectral Pack",
+      "chips_needed": 52500,
+      "reward": 4,
+      "state": "Defeated"
+    }
+  },
+  "hands_left": 4,
+  "discards_left": 0,
+  "hand": [
+    {
+      "facing": "front",
+      "cost": 1,
+      "type": "hand",
+      "main_description": "+11 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Ace of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "front",
+      "cost": 1,
+      "type": "hand",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "10 of Hearts",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "front",
+      "cost": 1,
+      "type": "hand",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Queen of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "front",
+      "cost": 1,
+      "type": "hand",
+      "main_description": "+10 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "Queen of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "front",
+      "cost": 1,
+      "type": "hand",
+      "main_description": "+7 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "7 of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "front",
+      "cost": 1,
+      "type": "hand",
+      "main_description": "+7 chips",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "7 of Diamonds",
+      "enhancement": "Default Base"
+    },
+    {
+      "facing": "front",
+      "cost": 1,
+      "type": "hand",
+      "main_description": "+4 chips +4 Mult",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "4 of Diamonds",
+      "enhancement": "Mult"
+    }
+  ],
+  "dollars": 1,
+  "jokers": [
+    {
+      "edition": "polychrome",
+      "facing": "front",
+      "cost": 0,
+      "rarity": 1,
+      "type": "joker",
+      "main_description": "+10 Mult if played hand contains a Flush",
+      "secondary_description": "X1.5 Mult",
+      "sells_for": 4,
+      "name": "Droll Joker",
+      "enhancement": "Droll Joker"
+    },
+    {
+      "facing": "front",
+      "cost": 4,
+      "rarity": 1,
+      "type": "joker",
+      "main_description": "Retrigger first played card used in scoring 2 additional times",
+      "secondary_description": "",
+      "sells_for": 2,
+      "name": "Hanging Chad",
+      "enhancement": "Hanging Chad"
+    },
+    {
+      "facing": "front",
+      "cost": 4,
+      "rarity": 1,
+      "type": "joker",
+      "main_description": "+1 hand size",
+      "secondary_description": "",
+      "sells_for": 2,
+      "name": "Juggler",
+      "enhancement": "Juggler"
+    },
+    {
+      "facing": "front",
+      "cost": 7,
+      "rarity": 3,
+      "type": "joker",
+      "main_description": "+250 Chips, -2 hand size",
+      "secondary_description": "",
+      "sells_for": 3,
+      "name": "Stuntman",
+      "enhancement": "Stuntman"
+    }
+  ],
+  "ante": 7,
+  "boss_blind_disabled": false,
+  "chips": 0,
+  "consumeables": [
+    {
+      "facing": "front",
+      "cost": 3,
+      "type": "joker",
+      "main_description": "Destroys up to 2 selected cards",
+      "secondary_description": "",
+      "sells_for": 1,
+      "name": "The Hanged Man",
+      "enhancement": "The Hanged Man"
+    }
+  ],
+  "max_jokers": 5,
+  "seed": "422J6NUH",
+  "can_reroll_boss": false,
+  "played_hands": [
+    {
+      "ante": 1,
+      "blind": "Boss",
+      "chips_earned": 162,
+      "hand_name": "Two Pair"
+    },
+    {
+      "ante": 1,
+      "blind": "Boss",
+      "chips_earned": 336,
+      "hand_name": "Pair"
+    },
+    {
+      "ante": 1,
+      "blind": "Boss",
+      "chips_earned": 90,
+      "hand_name": "Pair"
+    },
+    {
+      "ante": 1,
+      "blind": "Boss",
+      "chips_earned": 24,
+      "hand_name": "High Card"
+    },
+    {
+      "ante": 2,
+      "blind": "Big Blind",
+      "chips_earned": 5158.5,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 2,
+      "blind": "Boss",
+      "chips_earned": 4032,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 3,
+      "blind": "Boss",
+      "chips_earned": 4531.5,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 4,
+      "blind": "Big Blind",
+      "chips_earned": 18150,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 4,
+      "blind": "Boss",
+      "chips_earned": 17991.75,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 4,
+      "blind": "Boss",
+      "chips_earned": 4230,
+      "hand_name": "Two Pair"
+    },
+    {
+      "ante": 5,
+      "blind": "Big Blind",
+      "chips_earned": 19355.25,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 5,
+      "blind": "Boss",
+      "chips_earned": 9936,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 5,
+      "blind": "Boss",
+      "chips_earned": 13020,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 6,
+      "blind": "Big Blind",
+      "chips_earned": 7938,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 6,
+      "blind": "Big Blind",
+      "chips_earned": 432,
+      "hand_name": "High Card"
+    },
+    {
+      "ante": 6,
+      "blind": "Big Blind",
+      "chips_earned": 236.25,
+      "hand_name": "High Card"
+    },
+    {
+      "ante": 6,
+      "blind": "Big Blind",
+      "chips_earned": 23740.5,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 6,
+      "blind": "Boss",
+      "chips_earned": 8028,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 6,
+      "blind": "Boss",
+      "chips_earned": 6487.5,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 6,
+      "blind": "Boss",
+      "chips_earned": 7288.5,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 6,
+      "blind": "Boss",
+      "chips_earned": 18892.5,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 7,
+      "blind": "Small Blind",
+      "chips_earned": 47994,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 7,
+      "blind": "Big Blind",
+      "chips_earned": 31122,
+      "hand_name": "Flush"
+    },
+    {
+      "ante": 7,
+      "blind": "Big Blind",
+      "chips_earned": 8160.75,
+      "hand_name": "High Card"
+    },
+    {
+      "ante": 7,
+      "blind": "Big Blind",
+      "chips_earned": 9447.75,
+      "hand_name": "High Card"
+    },
+    {
+      "ante": 7,
+      "blind": "Big Blind",
+      "chips_earned": 7985.25,
+      "hand_name": "High Card"
+    }
+  ]
+}
