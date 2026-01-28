@@ -29,239 +29,16 @@ for (const run of runMetadata) {
 <html lang="en">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    <style>
-      /* Custom CSS variables for colors not in Tailwind theme */
-      :root {
-        --text-link: var(--color-accent);
-      }
-
-      /* Selected table cell outline */
-      td.selected {
-        outline: 3px solid #2563eb;
-        outline-offset: -3px;
-      }
-
-      /* Turn navigation buttons */
-      .turn-controls button:not(:disabled):hover {
-        background-color: var(--color-accent-hover) !important;
-      }
-
-      /* Turn slider styling */
-      .turn-slider {
-        -webkit-appearance: none;
-        appearance: none;
-        height: 8px;
-        border-radius: 4px;
-        background: var(--color-border-light);
-        outline: none;
-        cursor: pointer;
-      }
-
-      .turn-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--color-accent);
-        cursor: pointer;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        transition: transform 0.15s ease;
-      }
-
-      .turn-slider::-webkit-slider-thumb:hover {
-        background: var(--color-accent-hover);
-      }
-
-      .turn-slider::-moz-range-thumb {
-        width: 6px;
-        height: 14px;
-        border-radius: 3px;
-        background: var(--color-accent);
-        cursor: pointer;
-        border: none;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        transition: background 0.15s ease;
-      }
-
-      .turn-slider::-moz-range-thumb:hover {
-        background: var(--color-accent-hover);
-      }
-
-      .turn-slider::-moz-range-track {
-        height: 8px;
-        border-radius: 4px;
-        background: var(--color-border-light);
-      }
-
-      /* Turn browser layout - grid ensures text panel matches screenshot height */
-      .turn-browser-layout {
-        display: grid;
-        grid-template-columns: 1fr minmax(0, 36rem);
-        gap: 1rem;
-      }
-
-      /* Example state layout - grid ensures JSON panel matches screenshot height */
-      .example-state-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 36rem);
-        gap: 1rem;
-      }
-
-      .state-json-panel {
-        position: relative;
-        min-height: 0;
-      }
-
-      .state-json-content {
-        position: absolute;
-        inset: 0;
-        overflow-y: auto;
-        overflow-x: auto;
-        padding: 1rem;
-        background-color: var(--color-bg-secondary);
-        border-radius: 0.5rem;
-        margin: 0;
-        white-space: pre;
-      }
-
-      .reasoning-panel {
-        position: relative;
-        min-height: 0;
-      }
-
-      .reasoning-content {
-        position: absolute;
-        inset: 0;
-        overflow-y: auto;
-        padding: 0 1rem;
-      }
-
-      /* Term popover tooltips */
-      .term-popover::after {
-        content: attr(data-definition);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-8px);
-        background-color: rgba(0, 0, 0, 0.9);
-        color: white;
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        white-space: normal;
-        width: max-content;
-        max-width: 280px;
-        text-align: left;
-        opacity: 0;
-        pointer-events: none;
-        transition:
-          opacity 0.2s ease,
-          transform 0.2s ease;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
-
-      .term-popover::before {
-        content: "";
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-2px);
-        border: 6px solid transparent;
-        border-top-color: rgba(0, 0, 0, 0.9);
-        opacity: 0;
-        pointer-events: none;
-        transition:
-          opacity 0.2s ease,
-          transform 0.2s ease;
-        z-index: 1000;
-      }
-
-      .term-popover:hover::after,
-      .term-popover:hover::before {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-4px);
-      }
-
-      .term-popover:hover::before {
-        transform: translateX(-50%) translateY(2px);
-      }
-
-      @media (max-width: 768px) {
-        main {
-          padding: 4rem 1.5rem !important;
-        }
-
-        .article-header {
-          margin-bottom: 3rem !important;
-        }
-
-        .article-subtitle {
-          font-size: 1.125rem !important;
-        }
-
-        .table-container {
-          width: calc(100vw - 3rem) !important;
-          overflow-x: auto;
-        }
-
-        .turn-details {
-          height: auto !important;
-          max-height: 500px !important;
-        }
-
-        .turn-controls {
-          grid-template-columns: 1fr !important;
-          grid-template-rows: auto auto auto !important;
-          gap: 0.75rem !important;
-        }
-
-        .turn-controls button:first-child {
-          justify-self: stretch !important;
-        }
-
-        .turn-controls button:last-child {
-          justify-self: stretch !important;
-        }
-
-        .turn-controls button {
-          width: 100% !important;
-        }
-
-        .term-popover::after {
-          max-width: 200px !important;
-          font-size: 0.8rem !important;
-        }
-
-        .example-state-layout {
-          grid-template-columns: 1fr !important;
-        }
-
-        .state-json-panel {
-          position: relative !important;
-          height: auto !important;
-          max-height: 300px !important;
-        }
-
-        .state-json-content {
-          position: relative !important;
-          inset: auto !important;
-        }
-      }
-    </style>
   </head>
   <body>
-    <main class="max-w-[760px] mx-auto py-20 px-8">
+    <main>
       <header
-        class="article-header mb-16 pb-8 border-b"
+        class="mb-16 pb-8 border-b"
         style="border-color: var(--color-border-light);"
       >
         <h1 class="mb-4">Can LLMs beat Balatro?</h1>
         <p
-          class="article-subtitle text-xl font-normal leading-relaxed"
+          class="text-xl font-normal leading-relaxed"
           style="font-family: var(--font-family-serif); color: var(--color-text-secondary);"
         >
           In short: yes, and now I'm betting on Google to win the AI race.
@@ -312,14 +89,14 @@ for (const run of runMetadata) {
 
       <article class="leading-[1.8]">
         <p>
-          <strong>Balatro</strong> is a <span
-            class="term-popover relative underline decoration-dotted cursor-help"
+          <strong>Balatro</strong> is a           <span
+            class="relative underline decoration-dotted cursor-help"
             style="text-decoration-color: var(--color-accent); color: inherit;"
             data-definition="A game genre where progress is procedurally generated, features permanent death, and requires players to restart from the beginning when they die."
             >roguelike</span
           >
           <span
-            class="term-popover relative underline decoration-dotted cursor-help"
+            class="relative underline decoration-dotted cursor-help"
             style="text-decoration-color: var(--color-accent); color: inherit;"
             data-definition="A game genre where players build and customize a deck of cards throughout the game, making strategic choices about which cards to add, remove, or upgrade."
             >deckbuilder</span
@@ -329,7 +106,7 @@ for (const run of runMetadata) {
         </p>
 
         <div
-          class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start"
+          class="my-8 flex gap-6 justify-center items-start"
         >
           <div class="flex-1 flex flex-col items-center">
             <img
@@ -386,16 +163,16 @@ for (const run of runMetadata) {
         </ul>
 
 		<div
-          class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-4"
+          class="my-8 border rounded-lg p-4"
           style="border-color: var(--color-border-light);"
         >
           <p class="text-sm mb-4" style="color: var(--color-text-secondary);">
             An example game state and corresponding screenshot from Ante 7:
           </p>
-          <div class="example-state-layout">
-            <div class="state-json-panel">
+          <div>
+            <div>
               <pre
-                class="state-json-content text-xs leading-relaxed"
+                class="text-xs leading-relaxed"
                 style="color: var(--color-text-secondary);"
               >{await readFile(join(process.cwd(), "public", "example-state.json"), "utf-8")}</pre>
             </div>
@@ -448,10 +225,10 @@ for (const run of runMetadata) {
         </p>
 
         <div
-          class="table-container my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-4"
+          class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-4"
           style="border-color: var(--color-border-light);"
         >
-          <table class="outcomes-table w-full border-collapse text-sm">
+          <table class="w-full border-collapse text-sm">
             <thead>
               <tr>
                 <th
@@ -528,61 +305,61 @@ for (const run of runMetadata) {
                   style="border-color: var(--color-border-light);">$0.058</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="422J6NUH">Ante 5</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="PE93PR87">Ante 3</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="H1Z58VZ6">Ante 5</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="U15QWQGE">Ante 4</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="5U4K91D8">Ante 6</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="2JW2IH4X">Ante 6</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="22V4E3UE">Ante 6</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="M8KADSBQ">Ante 5</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="M3F6LPGY">Ante 2</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="claude"
                   data-seed="84N5GIYF">Ante 4</td
@@ -599,61 +376,61 @@ for (const run of runMetadata) {
                   style="border-color: var(--color-border-light);">$0.034</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="422J6NUH">Ante 7</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="PE93PR87">WON</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="H1Z58VZ6">Ante 6</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="U15QWQGE">WON</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="5U4K91D8">Ante 7</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="2JW2IH4X">Ante 5</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="22V4E3UE">Ante 5</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="M8KADSBQ">Ante 5</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="M3F6LPGY">Ante 4</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="openai"
                   data-seed="84N5GIYF">WON</td
@@ -670,61 +447,61 @@ for (const run of runMetadata) {
                   style="border-color: var(--color-border-light);">$0.008</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="422J6NUH">WON</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="PE93PR87">WON</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="H1Z58VZ6">WON</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="U15QWQGE">WON</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="5U4K91D8">WON</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="2JW2IH4X">WON</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="22V4E3UE">Ante 7</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="M8KADSBQ">WON</td
                 >
                 <td
-                  class="clickable lost p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="M3F6LPGY">Ante 4</td
                 >
                 <td
-                  class="clickable won p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
+                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
                   style="border-color: var(--color-border-light);"
                   data-agent="gemini"
                   data-seed="84N5GIYF">WON</td
@@ -736,9 +513,9 @@ for (const run of runMetadata) {
             Select a run from the table above to view the turn-by-turn history and agent reasoning of that run.
           </p>
           <div id="turn-browser" class="max-w-full">
-            <div class="turn-browser-layout">
+            <div>
               <div class="bg-white p-4 rounded">
-                <div class="turn-controls mb-4">
+                <div class="mb-4">
                   <div class="flex items-center gap-3">
                     <button
                       id="prev-turn-btn"
@@ -755,7 +532,7 @@ for (const run of runMetadata) {
                       min="0"
                       max="0"
                       value="0"
-                      class="turn-slider flex-1"
+                      class="flex-1"
                     />
                     <button
                       id="next-turn-btn"
@@ -783,8 +560,8 @@ for (const run of runMetadata) {
                   src="/turn-history/claude/22V4E3UE/0.png"
                 />
               </div>
-              <div class="reasoning-panel">
-                <div class="reasoning-content">
+              <div>
+                <div>
                   <h3 id="action-heading" class="text-lg font-semibold mb-3">Agent Reasoning</h3>
                   <div
                     id="reasoning-text"

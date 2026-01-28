@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
 @theme {
 	/* Custom color palette */
@@ -32,8 +32,8 @@
 		background: var(--color-bg-primary);
 	}
 	
-	main {
-		@apply w-[760px] max-w-[calc(100%-4rem)] mx-auto py-16 px-8;
+	header {
+		@apply max-w-[calc(100%-4rem)] mx-auto py-16 px-8;
 	}
 	
 	h1, h2, h3, h4, h5, h6 {
