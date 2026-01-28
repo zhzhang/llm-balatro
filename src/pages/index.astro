@@ -33,18 +33,18 @@ for (const run of runMetadata) {
   <body>
     <main>
       <header
-        class="max-w-[760px] mx-auto mb-16 pb-8 px-8 border-b"
+        class="max-w-[760px] mx-auto mb-8 md:mb-16 pb-8 px-4 md:px-8 border-b"
         style="border-color: var(--color-border-light);"
       >
         <h1 class="mb-4">Can LLMs beat Balatro?</h1>
         <p
-          class="text-xl font-normal leading-relaxed"
+          class="text-lg md:text-xl font-normal leading-relaxed"
           style="font-family: var(--font-family-serif); color: var(--color-text-secondary);"
         >
           In short: yes, and now I'm betting on Google to win the AI race.
         </p>
         <p
-          class="text-sm mt-2 flex items-center gap-3"
+          class="text-sm mt-2 flex flex-wrap items-center gap-2 md:gap-3"
           style="color: var(--color-text-secondary);"
         >
           <a
@@ -87,7 +87,7 @@ for (const run of runMetadata) {
         </p>
       </header>
 
-      <article class="leading-[1.8] m-6">
+      <article class="leading-[1.8] mx-4 md:mx-6 my-6">
         <div class="content-block">
         <p>
           <strong>Balatro</strong> is a <span
@@ -107,7 +107,7 @@ for (const run of runMetadata) {
         </p>
         </div>
 
-        <div class="my-8 flex gap-6 justify-center items-start">
+        <div class="my-8 flex flex-col md:flex-row gap-6 justify-center items-start">
           <div class="flex-1 flex flex-col items-center">
             <img
               src="/gifs/balatro-1.gif"
@@ -175,8 +175,8 @@ for (const run of runMetadata) {
           <p class="text-sm mb-4" style="color: var(--color-text-secondary);">
             An example screenshot and corresponding state JSON from Ante 7:
           </p>
-          <div class="flex gap-4">
-            <div class="flex-none" style="width: 60%;">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-none w-full md:w-[60%]">
               <img
                 src="/turn-history/openai/422J6NUH/170.png"
                 alt="Ante 7 game state screenshot"
@@ -184,7 +184,7 @@ for (const run of runMetadata) {
                 style="border-color: var(--color-border-light);"
               />
             </div>
-            <div class="relative" style="width: 40%;">
+            <div class="relative w-full md:w-[40%] h-64 md:h-auto">
               <div class="absolute inset-0 overflow-y-auto">
                 <pre
                   class="text-xs leading-relaxed m-0"
@@ -256,10 +256,11 @@ for (const run of runMetadata) {
         </div>
 
         <div
-          class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-4"
+          class="my-8 w-[calc(100vw-2rem)] md:w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-2 md:p-4"
           style="border-color: var(--color-border-light);"
         >
-          <table class="w-full border-collapse text-sm">
+          <div class="overflow-x-auto -mx-2 md:mx-0 px-2 md:px-0">
+          <table class="w-full border-collapse text-sm min-w-[800px]">
             <thead>
               <tr>
                 <th class="table-th">Seed</th>
@@ -441,6 +442,7 @@ for (const run of runMetadata) {
               </tr>
             </tbody>
           </table>
+          </div>
           <p
             class="mb-4 text-center italic text-sm"
             style="color: var(--color-text-secondary); opacity: 0.85;"
@@ -449,8 +451,8 @@ for (const run of runMetadata) {
             and agent reasoning of that run.
           </p>
           <div id="turn-browser" class="max-w-full">
-            <div class="flex gap-4">
-              <div class="flex-none bg-white p-4 rounded" style="width: 60%;">
+            <div class="flex flex-col md:flex-row gap-4">
+              <div class="flex-none bg-white p-2 md:p-4 rounded w-full md:w-[60%]">
                 <div class="mb-4">
                   <div class="flex items-center gap-3">
                     <button
@@ -496,8 +498,8 @@ for (const run of runMetadata) {
                   src="/turn-history/claude/22V4E3UE/0.png"
                 />
               </div>
-              <div class="relative" style="width: 40%;">
-                <div class="absolute inset-0 overflow-y-auto">
+              <div class="relative w-full md:w-[40%] min-h-[300px] md:min-h-0">
+                <div class="md:absolute md:inset-0 overflow-y-auto">
                   <h3 id="action-heading" class="text-lg font-semibold mb-3">
                     Agent Reasoning
                   </h3>
@@ -553,16 +555,16 @@ for (const run of runMetadata) {
         </p>
       </div>
       <div
-        class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start"
+        class="my-8 w-[calc(100vw-2rem)] md:w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start"
       >
         <div class="flex-1 flex flex-col items-center">
           <img
             src="/gifs/balatro-win.gif"
             alt="Balatro win"
-            class="w-1/2 h-auto rounded-lg shadow-md"
+            class="w-full md:w-1/2 h-auto rounded-lg shadow-md"
           />
           <p
-            class="mt-3 text-[0.85rem] text-center"
+            class="mt-3 text-[0.85rem] text-center px-4"
             style="color: var(--color-text-secondary);"
           >
             gemini-3-flash wins the game with a deck full of clubs.
@@ -731,7 +733,7 @@ for (const run of runMetadata) {
     </main>
 
     <footer
-      class="max-w-[760px] mx-auto py-8 px-8 border-t text-center text-sm"
+      class="max-w-[760px] mx-auto py-8 px-4 md:px-8 border-t text-center text-sm"
       style="border-color: var(--color-border-light); color: var(--color-text-secondary);"
     >
       <p>

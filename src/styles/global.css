@@ -282,22 +282,32 @@
 			font-size: 17px;
 		}
 		main {
-			padding-top: 3rem;
-			padding-bottom: 3rem;
-			padding-left: 1.5rem;
-			padding-right: 1.5rem;
-			max-width: calc(100% - 3rem);
+			padding-top: 2rem;
+			padding-bottom: 2rem;
 		}
 		h1 {
-			font-size: 2.25rem;
+			font-size: 1.875rem;
 		}
 		h2 {
-			font-size: 1.625rem;
-			margin-top: 2.5rem;
+			font-size: 1.5rem;
+			margin-top: 2rem;
 		}
 		h3 {
-			font-size: 1.375rem;
-			margin-top: 2rem;
+			font-size: 1.25rem;
+			margin-top: 1.5rem;
+		}
+		header {
+			padding-top: 2rem;
+			padding-bottom: 2rem;
+		}
+		ul, ol {
+			padding-left: 1.25rem;
+		}
+		table {
+			font-size: 0.8rem;
+		}
+		.table-th, .table-row-th, .table-td, .table-td-clickable, .table-td-loss, .table-td-win {
+			padding: 0.5rem;
 		}
 	}
 }
@@ -379,6 +389,15 @@
 		max-width: 760px;
 		margin-left: auto;
 		margin-right: auto;
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+	
+	@media (min-width: 769px) {
+		.content-block {
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 }
 
