@@ -89,7 +89,7 @@ for (const run of runMetadata) {
 
       <article class="leading-[1.8]">
         <p>
-          <strong>Balatro</strong> is a           <span
+          <strong>Balatro</strong> is a <span
             class="relative underline decoration-dotted cursor-help"
             style="text-decoration-color: var(--color-accent); color: inherit;"
             data-definition="A game genre where progress is procedurally generated, features permanent death, and requires players to restart from the beginning when they die."
@@ -105,9 +105,7 @@ for (const run of runMetadata) {
           requirement as rounds progress.
         </p>
 
-        <div
-          class="my-8 flex gap-6 justify-center items-start"
-        >
+        <div class="my-8 flex gap-6 justify-center items-start">
           <div class="flex-1 flex flex-col items-center">
             <img
               src="/gifs/balatro-1.gif"
@@ -156,13 +154,17 @@ for (const run of runMetadata) {
             probabilistic reasoning to make optimal decisions.
           </li>
           <li>
-            Long range planning and execution are needed to curate strong enough combos and decks that can keep up with
-            the exponentially increasing chip requirement.
+            Long range planning and execution are needed to curate strong enough
+            combos and decks that can keep up with the exponentially increasing
+            chip requirement.
           </li>
-          <li>Being turn-based, with no real-time or visuospatial qualities, the game is playable entirely in text form.</li>
+          <li>
+            Being turn-based, with no real-time or visuospatial qualities, the
+            game is playable entirely in text form.
+          </li>
         </ul>
 
-		<div
+        <div
           class="my-8 border rounded-lg p-4"
           style="border-color: var(--color-border-light);"
         >
@@ -173,8 +175,7 @@ for (const run of runMetadata) {
             <div>
               <pre
                 class="text-xs leading-relaxed"
-                style="color: var(--color-text-secondary);"
-              >{await readFile(join(process.cwd(), "public", "example-state.json"), "utf-8")}</pre>
+                style="color: var(--color-text-secondary);">{await readFile(join(process.cwd(), "public", "example-state.json"), "utf-8")}</pre>
             </div>
             <div>
               <img
@@ -187,42 +188,66 @@ for (const run of runMetadata) {
           </div>
         </div>
 
+        <div>
         <p>
-			As I was interested in the agents' decision making abilities, and not their ability to navigate and click around the game's UI to do things,
-			I elected to mod the game to stringify the state as JSON, rather than working with the agents through screenshots. Parts
-			of the mod code are available in the <a href="https://github.com/zhzhang/llm-balatro/tree/main/experiment-code" target="_blank" rel="noopener noreferrer">experiment-code</a> repository for your reference,
-			though I have not had a chance to formally turn it into a <a href="https://github.com/Steamodded/smods" target="_blank" rel="noopener noreferrer">Steamodded</a> mod.
+          As I was interested in the agents' decision making abilities, and not
+          their ability to navigate and click around the game's UI to do things,
+          I elected to mod the game to stringify the state as JSON, rather than
+          working with the agents through screenshots. Parts of the mod code are
+          available in the <a
+            href="https://github.com/zhzhang/llm-balatro/tree/main/experiment-code"
+            target="_blank"
+            rel="noopener noreferrer">experiment-code</a
+          > repository for your reference, though I have not had a chance to formally
+          turn it into a <a
+            href="https://github.com/Steamodded/smods"
+            target="_blank"
+            rel="noopener noreferrer">Steamodded</a
+          > mod.
         </p>
 
+        <p>The experimental setup was as follows:</p>
+        <ul>
+          <li>
+            I had models from OpenAI, Claude, and Google each play 10 games
+            using the same set of 10 run seeds, to reduce the effect of
+            run-to-run variance in the comparison.
+          </li>
+          <li>The maximum thinking effort setting for each model was used.</li>
+          <li>
+            I gave a system prompt that explained the general rules and flow of
+            the game, which can be viewed <a
+              href="https://github.com/zhzhang/llm-balatro/blob/main/experiment-code/prompts.py#L88"
+              target="_blank"
+              rel="noopener noreferrer">here</a
+            >. The system prompt does not provide any information on specific
+            instances of game objects like jokers, cards, consumable, or bosses,
+            and does not give any strategies for playing the game.
+          </li>
+          <li>
+            Because the rules for scoring hands can involve very long sequences
+            of cards triggering compounding special effects, I helped the agent
+            gauge the amount of chips it might earn by playing a hand by
+            providing a history of the last 7 hands played. This backwards
+            looking memory of recent hands played is similar in feeling to how a
+            human player gauges how "strong" their next played hand might be.
+          </li>
+          <li>
+            In addition to the current state, I also provided the state, action
+            taken, and agent's reasoning for the last 3 turns, to help maintain
+            some tactical continuity across turns.
+          </li>
+          <li>
+            All games were played on White Stake (base/easiest difficulty) and
+            Red Deck (first deck available in the game). Not the biggest
+            challenge in the world, I know.
+          </li>
+        </ul>
         <p>
-		The experimental setup was as follows:
-		</p>
-		<ul>
-		<li>
-			I had models from OpenAI, Claude, and Google each play 10 games
-			using the same set of 10 run seeds, to reduce the effect of run-to-run variance in the comparison.
-		</li>
-		<li>
-			The maximum thinking effort setting for each model was used.
-		</li>
-		<li>
-			I gave a system prompt that explained the general rules and flow of the game, which can be viewed <a href="https://github.com/zhzhang/llm-balatro/blob/main/experiment-code/prompts.py#L88" target="_blank" rel="noopener noreferrer">here</a>.
-			The system prompt does not provide any information on specific instances of game objects like jokers, cards, consumable, or bosses, and does not give any strategies for playing the game.
-		</li>
-		<li>
-			Because the rules for scoring hands can involve very long sequences of cards triggering compounding special effects, I helped the agent gauge the amount of chips it might earn by playing a hand by providing a history of the last 7 hands played.
-			This backwards looking memory of recent hands played is similar in feeling to how a human player gauges how "strong" their next played hand might be.
-		</li>
-		<li>
-			In addition to the current state, I also provided the state, action taken, and agent's reasoning for the last 3 turns, to help maintain some tactical continuity across turns. 
-		</li>
-		<li>
-			All games were played on White Stake (base/easiest difficulty) and Red Deck (first deck available in the game). Not the biggest challenge in the world, I know.
-		</li>
-		</ul>
-		<p>
-		  Here are the results, including the average cost per turn for each model:
+          Here are the results, including the average cost per turn for each
+          model:
         </p>
+        </div>
 
         <div
           class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 border rounded-lg p-4"
@@ -231,286 +256,191 @@ for (const run of runMetadata) {
           <table class="w-full border-collapse text-sm">
             <thead>
               <tr>
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >Seed</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >Cost per turn</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >422J6NUH</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >PE93PR87</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >H1Z58VZ6</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >U15QWQGE</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >5U4K91D8</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >2JW2IH4X</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >22V4E3UE</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >M8KADSBQ</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >M3F6LPGY</th
-                >
-                <th
-                  class="p-3 text-center border font-semibold sticky top-0"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >84N5GIYF</th
-                >
+                <th class="table-th">Seed</th>
+                <th class="table-th">Cost per turn</th>
+                <th class="table-th">422J6NUH</th>
+                <th class="table-th">PE93PR87</th>
+                <th class="table-th">H1Z58VZ6</th>
+                <th class="table-th">U15QWQGE</th>
+                <th class="table-th">5U4K91D8</th>
+                <th class="table-th">2JW2IH4X</th>
+                <th class="table-th">22V4E3UE</th>
+                <th class="table-th">M8KADSBQ</th>
+                <th class="table-th">M3F6LPGY</th>
+                <th class="table-th">84N5GIYF</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th
-                  class="p-3 border font-semibold text-left"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >claude-4.5-sonnet</th
-                >
+                <th class="table-row-th">claude-4.5-sonnet</th>
+                <td class="table-td">$0.058</td>
                 <td
-                  class="p-3 text-center border"
-                  style="border-color: var(--color-border-light);">$0.058</td
-                >
-                <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="422J6NUH">Ante 5</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="PE93PR87">Ante 3</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="H1Z58VZ6">Ante 5</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="U15QWQGE">Ante 4</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="5U4K91D8">Ante 6</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="2JW2IH4X">Ante 6</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="22V4E3UE">Ante 6</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="M8KADSBQ">Ante 5</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="M3F6LPGY">Ante 2</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="claude"
                   data-seed="84N5GIYF">Ante 4</td
                 >
               </tr>
               <tr>
-                <th
-                  class="p-3 border font-semibold text-left"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >gpt-5.2</th
-                >
+                <th class="table-row-th">gpt-5.2</th>
+                <td class="table-td">$0.034</td>
                 <td
-                  class="p-3 text-center border"
-                  style="border-color: var(--color-border-light);">$0.034</td
-                >
-                <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="openai"
                   data-seed="422J6NUH">Ante 7</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="openai"
                   data-seed="PE93PR87">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="openai"
                   data-seed="H1Z58VZ6">Ante 6</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="openai"
                   data-seed="U15QWQGE">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="openai"
                   data-seed="5U4K91D8">Ante 7</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="openai"
                   data-seed="2JW2IH4X">Ante 5</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="openai"
                   data-seed="22V4E3UE">Ante 5</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="openai"
                   data-seed="M8KADSBQ">Ante 5</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="openai"
                   data-seed="M3F6LPGY">Ante 4</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="openai"
                   data-seed="84N5GIYF">WON</td
                 >
               </tr>
               <tr>
-                <th
-                  class="p-3 border font-semibold text-left"
-                  style="border-color: var(--color-border-light); background-color: var(--color-bg-secondary);"
-                  >gemini-3-flash</th
-                >
+                <th class="table-row-th">gemini-3-flash</th>
+                <td class="table-td">$0.008</td>
                 <td
-                  class="p-3 text-center border"
-                  style="border-color: var(--color-border-light);">$0.008</td
-                >
-                <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="422J6NUH">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="PE93PR87">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="H1Z58VZ6">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="U15QWQGE">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="5U4K91D8">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="2JW2IH4X">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="gemini"
                   data-seed="22V4E3UE">Ante 7</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="M8KADSBQ">WON</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-red-50 text-red-500"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-loss"
                   data-agent="gemini"
                   data-seed="M3F6LPGY">Ante 4</td
                 >
                 <td
-                  class="clickable p-3 text-center border cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-50 text-green-600 font-semibold"
-                  style="border-color: var(--color-border-light);"
+                  class="clickable table-td-win"
                   data-agent="gemini"
                   data-seed="84N5GIYF">WON</td
                 >
               </tr>
             </tbody>
           </table>
-          <p class="mb-4 text-center italic text-sm" style="color: var(--color-text-secondary); opacity: 0.85;">
-            Select a run from the table above to view the turn-by-turn history and agent reasoning of that run.
+          <p
+            class="mb-4 text-center italic text-sm"
+            style="color: var(--color-text-secondary); opacity: 0.85;"
+          >
+            Select a run from the table above to view the turn-by-turn history
+            and agent reasoning of that run.
           </p>
           <div id="turn-browser" class="max-w-full">
             <div>
@@ -562,7 +492,9 @@ for (const run of runMetadata) {
               </div>
               <div>
                 <div>
-                  <h3 id="action-heading" class="text-lg font-semibold mb-3">Agent Reasoning</h3>
+                  <h3 id="action-heading" class="text-lg font-semibold mb-3">
+                    Agent Reasoning
+                  </h3>
                   <div
                     id="reasoning-text"
                     class="text-sm leading-relaxed whitespace-pre-wrap"
@@ -584,129 +516,205 @@ for (const run of runMetadata) {
           </div>
         </div>
       </article>
-	  <h2 class="text-2xl font-semibold mb-4">An unexpected outcome</h2>
+      <h2 class="text-2xl font-semibold mb-4">An unexpected outcome</h2>
       <p>
         Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
-        despite the latter two being bigger and more expensive. I originally planned to 
-		compare the "default" model tier for each company, and given that I started with Claude (and was seeing the above performances),
-		was even in the process of implementing <a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener noreferrer">Reflexion</a>
-	, <a href="https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/" target="_blank" rel="noopener noreferrer">AlphaEvolve</a>
-	and <a href="https://voyager.minedojo.org/" target="_blank" rel="noopener noreferrer">Voyager</a>-inspired approaches to help the agent develop for itself a set of useful gameplay policies.
-		However, when by chance I swapped to gemini-3-flash for a quick point of comparison, I was shocked to see that it crushed its first run while claude-4.5-sonnet was struggling to reliably get to Ante 7.
-    Not only that, it had built a deck of nearly entirely clubs cards by the end of the run, showing that its strategy was highly coherent throughout the 284 turn run.
+        despite the latter two being bigger and more expensive. I originally planned
+        to compare the "default" model tier for each company, and given that I started
+        with Claude (and was seeing the above performances), was even in the process
+        of implementing <a
+          href="https://arxiv.org/abs/2303.11366"
+          target="_blank"
+          rel="noopener noreferrer">Reflexion</a
+        >
+        , <a
+          href="https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/"
+          target="_blank"
+          rel="noopener noreferrer">AlphaEvolve</a
+        >
+        and <a
+          href="https://voyager.minedojo.org/"
+          target="_blank"
+          rel="noopener noreferrer">Voyager</a
+        >-inspired approaches to help the agent develop for itself a set of
+        useful gameplay policies. However, when by chance I swapped to
+        gemini-3-flash for a quick point of comparison, I was shocked to see
+        that it crushed its first run while claude-4.5-sonnet was struggling to
+        reliably get to Ante 7. Not only that, it had built a deck of nearly
+        entirely clubs cards by the end of the run, showing that its strategy
+        was highly coherent throughout the 284 turn run.
       </p>
       <div
-      class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start"
-    >
-      <div class="flex-1 flex flex-col items-center">
-        <img
-          src="/gifs/balatro-win.gif"
-          alt="Balatro win"
-          class="w-1/2 h-auto rounded-lg shadow-md"
-        />
-        <p
-          class="mt-3 text-[0.85rem] text-center"
-          style="color: var(--color-text-secondary);"
-        >
-        gemini-3-flash wins the game with a deck full of clubs.
-        </p>
+        class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start"
+      >
+        <div class="flex-1 flex flex-col items-center">
+          <img
+            src="/gifs/balatro-win.gif"
+            alt="Balatro win"
+            class="w-1/2 h-auto rounded-lg shadow-md"
+          />
+          <p
+            class="mt-3 text-[0.85rem] text-center"
+            style="color: var(--color-text-secondary);"
+          >
+            gemini-3-flash wins the game with a deck full of clubs.
+          </p>
+        </div>
       </div>
-    </div> 
-	  <p>
-		<a
+      <p>
+        <a
           href="#turn-browser"
           onclick="selectRunAndTurn('gemini', '5U4K91D8', 9); return false;"
           class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
           style="color: var(--color-accent);"
-        >Turn 9 of the gemini run on seed 5U4K91D8</a> is what tipped me off to what was happening.
-		In its reasoning, gemini mentions offhandedly that the Blank Voucher, although it says "Does nothing?" as the textual description of its effect
-		 (which is what the agent sees), actually unlocks the Antimatter Voucher for later purchase in the run, which allows the player to have an extra joker slot.
-		The thing is <em>none of this information is in the system prompt or the state passed to the model</em>.
-	  </p>
-
-	  <p>
-		Scrolling through the turn-by-turn history of gemini runs, it becomes clear that gemini simply <em>knew more</em> about the game
-		than the other two models. As a result, it also had some gameplay habits that could technically be arrived at by reasoning alone,
-		but the other models could not reliably replicate. It:
-	  </p>
-	  <ul>
-		<li>Knew instinctively to try and beat rounds with as few hands as possible to earn an extra $1 per hand, averaging 1.59 hands played per round vs 2.07 for claude and 2.08 for gpt.
-			This is despite the hand payout being part of the system prompt.
-			For example, it <a
-          href="#turn-browser"
-          onclick="selectRunAndTurn('gemini', '22V4E3UE', 4); return false;"
-          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
-          style="color: var(--color-accent);"
-        >opted to discard and redraw two low diamond cards</a> in order to try and pass the round with a single hand, whereas claude
-		<a
-          href="#turn-browser"
-          onclick="selectRunAndTurn('claude', 'M8KADSBQ', 5); return false;"
-          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
-          style="color: var(--color-accent);"
-        >slams the flush with a discard left over</a> in a similar situation.
-		</li>
-		<li>
-			Discarded more aggressively, and <em>remembered</em> that it <em>could</em> discard more often than the other two models, which is consistent with the goal of trying to pass the round with a single hand.
-			Claude often 
-			<a
-          href="#turn-browser"
-          onclick="selectRunAndTurn('claude', 'M3F6LPGY', 28); return false;"
-          class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
-          style="color: var(--color-accent);"
-        >forgot it could discard</a> and redraw cards to shape its hand, and lost at avoidable times with resources left to spend.
-		</li>
-		<li>
-			Maintained 2-3x as much money in reserve on average, $22.71, compared to $9.25 for claude and $7.70 for gpt.
-			This is because money in reserve earns $1 of interest per $5 held upon winning a round, up to a maximum of $25 ($5 of interest), something that was noted in the system prompt.
-			Gemini maintains about as much money in reserve as the maximum interest gain allows, thereby maximizing its economy and optionality in shops.
-		</li>
-		<li>
-			Understood that it could (and should) make modifications to the deck itself with tarot cards. By the <a href="#turn-browser" onclick="selectRunAndTurn('gemini', '422J6NUH', 284); return false;" class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer" style="color: var(--color-accent);">end of the 422J6NUH run</a>, it had a deck composed
-			nearly entirely of clubs cards, while the other agents typically didn't understand how to slowly change their deck composition over time.
-		</li>
-	  </ul>
-	  <p>
-		Because these are idiosyncrasies of Balatro but not poker, the other two models had to rely on sheer comprehension and reasoning to play the game, and to an extent had to forget their knowledge of poker that was being induced by the overall vocabulary of the game, to perform effectively.
-	  </p>
-
-	  <h2 class="text-2xl font-semibold mb-4">Why Google is going to win the AI race</h2>
-      <p>
-		Given how big the performance gap is, and the clues that point to the fact that it is knowledge based, not reasoning based,
-		the source of the gap must be the pretraining data mix.
-    When I originally started the agent development, I searched for a textual guide (i.e. on Reddit) to see if I could get Claude to win if I gave it a manually written strategy.
-		While written coherent written guides that went beyond individual tips and tricks were hard to find, Youtube content of this sort was abundant, probably outnumbering written content for Balatro by at least 10x.
-		</p>
-	<p>
-		And not just for Balatro, Google possesses, through Youtube, high fidelity multi-modal content on pretty much any topic you can imagine,
-		let alone the user-action data emitted by the rest of its portfolio, from Gmail to Gsuite to Maps to the search engine itself.
-		Among the major foundation model companies, Google alone (since Microsoft is not in this race) has products in which its existing users live, work, <em>and</em> play,
-    a massive advantage over model builders that are starting from scraping the internet, with no existing product portfolio to act as data source and distribution.
+          >Turn 9 of the gemini run on seed 5U4K91D8</a
+        > is what tipped me off to what was happening. In its reasoning, gemini mentions
+        offhandedly that the Blank Voucher, although it says "Does nothing?" as the
+        textual description of its effect (which is what the agent sees), actually
+        unlocks the Antimatter Voucher for later purchase in the run, which allows
+        the player to have an extra joker slot. The thing is <em
+          >none of this information is in the system prompt or the state passed
+          to the model</em
+        >.
       </p>
 
       <p>
-		The <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html" target="_blank" rel="noopener noreferrer">Bitter Lesson</a>-adjacent truth, highlighted by this experiment, is that the team that has better data is going to have better results for 10x cheaper inference than 
-		the team that must make up for this gap with more clever reasoning techniques, and Google is just much more likely to have any particular topic be in distribution than the other model companies.
+        Scrolling through the turn-by-turn history of gemini runs, it becomes
+        clear that gemini simply <em>knew more</em> about the game than the other
+        two models. As a result, it also had some gameplay habits that could technically
+        be arrived at by reasoning alone, but the other models could not reliably
+        replicate. It:
       </p>
-	  
-	  <h2 class="text-2xl font-semibold mb-4">What's next?</h2>
-	  <p>
-	  Admittedly this initial experiment was done at the easiest difficulty setting, and with a single deck.
-	  As far as Balatro goes, we've only made it past the lobby with LLMs. There are 7 more difficulties, which add challenges like:
-	  </p>
-	  <ul>
-		<li>Reducing rewards for winning rounds</li>
-		<li>Increasing the chips needed to pass each round</li>
-		<li>Making power ups cost more, be temporary, or most interestingly, be unable to be sold, making strategy pivots more challenging.</li>
-	  </ul>
-	  <p>
-		Achieving good win rates on higher difficulties may require the Reflexion/Voyager/AlphaEvolve-style approaches that were unnecesary at base difficulty.
-	  </p>
+      <ul>
+        <li>
+          Knew instinctively to try and beat rounds with as few hands as
+          possible to earn an extra $1 per hand, averaging 1.59 hands played per
+          round vs 2.07 for claude and 2.08 for gpt. This is despite the hand
+          payout being part of the system prompt. For example, it <a
+            href="#turn-browser"
+            onclick="selectRunAndTurn('gemini', '22V4E3UE', 4); return false;"
+            class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+            style="color: var(--color-accent);"
+            >opted to discard and redraw two low diamond cards</a
+          > in order to try and pass the round with a single hand, whereas claude
+          <a
+            href="#turn-browser"
+            onclick="selectRunAndTurn('claude', 'M8KADSBQ', 5); return false;"
+            class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+            style="color: var(--color-accent);"
+            >slams the flush with a discard left over</a
+          > in a similar situation.
+        </li>
+        <li>
+          Discarded more aggressively, and <em>remembered</em> that it <em
+            >could</em
+          > discard more often than the other two models, which is consistent with
+          the goal of trying to pass the round with a single hand. Claude often
+          <a
+            href="#turn-browser"
+            onclick="selectRunAndTurn('claude', 'M3F6LPGY', 28); return false;"
+            class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+            style="color: var(--color-accent);">forgot it could discard</a
+          > and redraw cards to shape its hand, and lost at avoidable times with resources
+          left to spend.
+        </li>
+        <li>
+          Maintained 2-3x as much money in reserve on average, $22.71, compared
+          to $9.25 for claude and $7.70 for gpt. This is because money in
+          reserve earns $1 of interest per $5 held upon winning a round, up to a
+          maximum of $25 ($5 of interest), something that was noted in the
+          system prompt. Gemini maintains about as much money in reserve as the
+          maximum interest gain allows, thereby maximizing its economy and
+          optionality in shops.
+        </li>
+        <li>
+          Understood that it could (and should) make modifications to the deck
+          itself with tarot cards. By the <a
+            href="#turn-browser"
+            onclick="selectRunAndTurn('gemini', '422J6NUH', 284); return false;"
+            class="border-b border-transparent transition-colors duration-200 hover:border-[var(--color-accent)] cursor-pointer"
+            style="color: var(--color-accent);">end of the 422J6NUH run</a
+          >, it had a deck composed nearly entirely of clubs cards, while the
+          other agents typically didn't understand how to slowly change their
+          deck composition over time.
+        </li>
+      </ul>
+      <p>
+        Because these are idiosyncrasies of Balatro but not poker, the other two
+        models had to rely on sheer comprehension and reasoning to play the
+        game, and to an extent had to forget their knowledge of poker that was
+        being induced by the overall vocabulary of the game, to perform
+        effectively.
+      </p>
 
-	  <p>
-		Moreover, Balatro remains an interesting test bed to study long range reasoning in LLMs, and it has an extensive community of modders who are constantly creating new game mechanics
-    that are out-of-distribution even for Gemini.
-    In general, games are great tests of reasoning and long-term planning, and creating a general game-playing framework for benchmarking LLMs is a promising direction for the future.
-	  </p>
+      <h2 class="text-2xl font-semibold mb-4">
+        Why Google is going to win the AI race
+      </h2>
+      <p>
+        Given how big the performance gap is, and the clues that point to the
+        fact that it is knowledge based, not reasoning based, the source of the
+        gap must be the pretraining data mix. When I originally started the
+        agent development, I searched for a textual guide (i.e. on Reddit) to
+        see if I could get Claude to win if I gave it a manually written
+        strategy. While written coherent written guides that went beyond
+        individual tips and tricks were hard to find, Youtube content of this
+        sort was abundant, probably outnumbering written content for Balatro by
+        at least 10x.
+      </p>
+      <p>
+        And not just for Balatro, Google possesses, through Youtube, high
+        fidelity multi-modal content on pretty much any topic you can imagine,
+        let alone the user-action data emitted by the rest of its portfolio,
+        from Gmail to Gsuite to Maps to the search engine itself. Among the
+        major foundation model companies, Google alone (since Microsoft is not
+        in this race) has products in which its existing users live, work, <em
+          >and</em
+        > play, a massive advantage over model builders that are starting from scraping
+        the internet, with no existing product portfolio to act as data source and
+        distribution.
+      </p>
+
+      <p>
+        The <a
+          href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html"
+          target="_blank"
+          rel="noopener noreferrer">Bitter Lesson</a
+        >-adjacent truth, highlighted by this experiment, is that the team that
+        has better data is going to have better results for 10x cheaper
+        inference than the team that must make up for this gap with more clever
+        reasoning techniques, and Google is just much more likely to have any
+        particular topic be in distribution than the other model companies.
+      </p>
+
+      <h2 class="text-2xl font-semibold mb-4">What's next?</h2>
+      <p>
+        Admittedly this initial experiment was done at the easiest difficulty
+        setting, and with a single deck. As far as Balatro goes, we've only made
+        it past the lobby with LLMs. There are 7 more difficulties, which add
+        challenges like:
+      </p>
+      <ul>
+        <li>Reducing rewards for winning rounds</li>
+        <li>Increasing the chips needed to pass each round</li>
+        <li>
+          Making power ups cost more, be temporary, or most interestingly, be
+          unable to be sold, making strategy pivots more challenging.
+        </li>
+      </ul>
+      <p>
+        Achieving good win rates on higher difficulties may require the
+        Reflexion/Voyager/AlphaEvolve-style approaches that were unnecesary at
+        base difficulty.
+      </p>
+
+      <p>
+        Moreover, Balatro remains an interesting test bed to study long range
+        reasoning in LLMs, and it has an extensive community of modders who are
+        constantly creating new game mechanics that are out-of-distribution even
+        for Gemini. In general, games are great tests of reasoning and long-term
+        planning, and creating a general game-playing framework for benchmarking
+        LLMs is a promising direction for the future.
+      </p>
     </main>
 
     <footer
@@ -774,8 +782,7 @@ for (const run of runMetadata) {
           const data = await response.json();
           reasoningText.textContent =
             data.reasoning || "No reasoning available";
-          actionHeading.textContent =
-            data.action || "Agent Action";
+          actionHeading.textContent = data.action || "Agent Action";
         } catch (e) {
           reasoningText.textContent = "Failed to load reasoning";
           actionHeading.textContent = "Agent Action";
@@ -850,7 +857,9 @@ for (const run of runMetadata) {
         updateTurnDisplay();
 
         // Scroll the turn browser into view
-        document.getElementById("turn-browser").scrollIntoView({ behavior: "smooth", block: "start" });
+        document
+          .getElementById("turn-browser")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       // Make selectRunAndTurn available globally for inline onclick handlers
