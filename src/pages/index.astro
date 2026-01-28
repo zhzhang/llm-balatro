@@ -811,13 +811,30 @@ for (const run of runMetadata) {
       <p>
         Notably, gemini-3-<em>flash</em> trounces both claude-4.5-sonnet and gpt-5.2,
         despite the latter two being bigger and more expensive. I originally planned to 
-		compare the "default" model tier for each company, and given that I started with Claude,
+		compare the "default" model tier for each company, and given that I started with Claude (and was seeing the above performances),
 		was even in the process of implementing <a href="https://arxiv.org/abs/2303.11366" target="_blank" rel="noopener noreferrer">Reflexion</a>
 	, <a href="https://deepmind.google/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/" target="_blank" rel="noopener noreferrer">AlphaEvolve</a>
 	and <a href="https://voyager.minedojo.org/" target="_blank" rel="noopener noreferrer">Voyager</a>-inspired approaches to help the agent develop for itself a set of useful gameplay policies.
 		However, when by chance I swapped to gemini-3-flash for a quick point of comparison, I was shocked to see that it crushed its first run while claude-4.5-sonnet was struggling to reliably get to Ante 7.
+    Not only that, it had built a deck of nearly entirely clubs cards by the end of the run, showing that its strategy was highly coherent throughout the 284 turn run.
       </p>
-	  
+      <div
+      class="my-8 w-[calc(100vw-4rem)] max-w-[1400px] relative left-1/2 -translate-x-1/2 flex gap-6 justify-center items-start"
+    >
+      <div class="flex-1 flex flex-col items-center">
+        <img
+          src="/gifs/balatro-win.gif"
+          alt="Balatro win"
+          class="w-1/2 h-auto rounded-lg shadow-md"
+        />
+        <p
+          class="mt-3 text-[0.85rem] text-center"
+          style="color: var(--color-text-secondary);"
+        >
+        gemini-3-flash wins the game with a deck full of clubs.
+        </p>
+      </div>
+    </div> 
 	  <p>
 		<a
           href="#turn-browser"
